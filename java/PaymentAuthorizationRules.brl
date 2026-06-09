@@ -1,0 +1,118 @@
+// =============================================================================
+// IBM ODM Business Rules — BAL (Business Action Language)
+// Decision Center project: PaymentAuthorizationRuleApp
+// Ruleflow: PaymentAuthorizationFlow (sequential, short-circuit on DECLINED)
+// =============================================================================
+
+
+// -----------------------------------------------------------------------------
+// Rule 1: Amount Limit
+// Package: payment.authorization.limits
+// -----------------------------------------------------------------------------
+rule "Decline if transaction exceeds single-payment limit"
+    when
+        the transaction amount of the transaction is more than 10000
+    then
+        set the decision of the response to "DECLINED";
+        set the response code of the response to "05";
+        set the decline reason of the response to
+            "Transaction amount exceeds the $10,000 single-payment limit";
+        add a new rule trace to the audit trail of the response where
+            the rule name is "AmountLimitRule" ,
+            fired is true ,
+            the result is "DECLINED";
+end
+
+
+// -----------------------------------------------------------------------------
+// Rule 2: Country Blacklist
+// Package: payment.authorization.compliance
+// -----------------------------------------------------------------------------
+rule "Decline if merchant country is OFAC-sanctioned"
+    when
+        the country of the transaction is in { "KP" , "IR" , "CU" , "SY" , "RU" , "BY" }
+    then
+        set the decision of the response to "DECLINED";
+        set the response code of the response to "05";
+        set the decline reason of the response to
+            "Merchant country is restricted under OFAC sanctions";
+        add a new rule trace to the audit trail of the response where
+            the rule name is "CountryBlacklistRule" ,
+            fired is true ,
+            the result is "DECLINED";
+end
+
+
+// -----------------------------------------------------------------------------
+// Rule 3: MCC Restriction
+// Package: payment.authorization.compliance
+// -----------------------------------------------------------------------------
+rule "Decline restricted merchant category codes"
+    when
+        the mcc of the transaction is in { "7995" , "9754" }
+    then
+        set the decision of the response to "DECLINED";
+        set the response code of the response to "57";   // Transaction not permitted
+        set the decline reason of the response to
+            "Merchant category is not permitted on this card";
+        add a new rule trace to the audit trail of the response where
+            the rule name is "MCCRestrictionRule" ,
+            fired is true ,
+            the result is "DECLINED";
+end
+
+
+// -----------------------------------------------------------------------------
+// Rule 4: Card Validity (Luhn — handled in XOM helper method)
+// Package: payment.authorization.card
+// -----------------------------------------------------------------------------
+rule "Decline if card number fails Luhn validation"
+    when
+        the card number of the transaction is not a valid card number
+    then
+        set the decision of the response to "DECLINED";
+        set the response code of the response to "14";   // Invalid card number
+        set the decline reason of the response to
+            "Card number failed validation check";
+        add a new rule trace to the audit trail of the response where
+            the rule name is "CardValidityRule" ,
+            fired is true ,
+            the result is "DECLINED";
+end
+
+
+// -----------------------------------------------------------------------------
+// Rule 5: Contactless Limit
+// Package: payment.authorization.limits
+// -----------------------------------------------------------------------------
+rule "Decline contactless transaction over PCI limit"
+    when
+        the entry mode of the transaction is "NFC_CONTACTLESS"
+        and the transaction amount of the transaction is more than 250
+    then
+        set the decision of the response to "DECLINED";
+        set the response code of the response to "61";   // Exceeds withdrawal limit
+        set the decline reason of the response to
+            "Contactless transactions are limited to $250";
+        add a new rule trace to the audit trail of the response where
+            the rule name is "ContactlessLimitRule" ,
+            fired is true ,
+            the result is "DECLINED";
+end
+
+
+// -----------------------------------------------------------------------------
+// Default Rule: Approve if no prior rule declined
+// Package: payment.authorization.default
+// Priority: -100 (runs last)
+// -----------------------------------------------------------------------------
+rule "Approve transaction when all checks pass"
+    priority -100
+    when
+        the decision of the response is not "DECLINED"
+    then
+        set the decision of the response to "APPROVED";
+        set the response code of the response to "00";
+        set the authorization code of the response to
+            a new 6-character authorization code;
+end
