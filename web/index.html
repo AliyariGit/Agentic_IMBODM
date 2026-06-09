@@ -1,181 +1,248 @@
 <!DOCTYPE html>
-<html lang="en">
+<html data-theme="dark" lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Agentic AI + IBM ODM — Payment Authorization Demo</title>
+<link id="hljs-theme" rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <style>
-  :root {
-    --bg:#0d1117; --surface:#161b22; --surface2:#21262d; --border:#30363d;
-    --text:#e6edf3; --muted:#8b949e;
-    --approved:#3fb950; --approved-bg:#0d2a14;
-    --declined:#f85149; --declined-bg:#2a0d0d;
-    --accent:#58a6ff; --accent-bg:#0d1f3c;
-    --warning:#d29922; --pass:#238636;
-    --node-idle:#21262d; --node-active:#1f6feb; --node-done-ok:#238636; --node-done-err:#b91c1c;
-  }
-  *{box-sizing:border-box;margin:0;padding:0;}
-  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:80px;}
+/* ── Theme variables ────────────────────────────────────── */
+:root {
+  --bg:#0d1117; --surface:#161b22; --surface2:#21262d; --border:#30363d;
+  --text:#e6edf3; --muted:#8b949e;
+  --approved:#3fb950; --approved-bg:#0d2a14;
+  --declined:#f85149; --declined-bg:#2a0d0d;
+  --accent:#58a6ff; --accent-bg:#0d1f3c;
+  --warning:#d29922;
+  --node-idle:#21262d; --node-active:#1f6feb;
+  --node-done-ok:#238636; --node-done-err:#b91c1c;
+  --callout-bg:#161b22; --callout-border:#388bfd;
+  --step-num:#388bfd;
+  --tag-bg:#21262d; --tag-border:#30363d; --tag-text:#8b949e;
+}
+[data-theme="light"] {
+  --bg:#f6f8fa; --surface:#ffffff; --surface2:#f0f2f5; --border:#d0d7de;
+  --text:#1f2328; --muted:#636c76;
+  --approved:#1a7f37; --approved-bg:#dafbe1;
+  --declined:#cf222e; --declined-bg:#ffebe9;
+  --accent:#0969da; --accent-bg:#ddf4ff;
+  --warning:#9a6700;
+  --node-idle:#f0f2f5; --node-active:#0969da;
+  --node-done-ok:#1a7f37; --node-done-err:#cf222e;
+  --callout-bg:#ddf4ff; --callout-border:#0969da;
+  --step-num:#0969da;
+  --tag-bg:#eaeef2; --tag-border:#d0d7de; --tag-text:#57606a;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:80px;transition:background .25s,color .25s;}
 
-  /* ── Header ── */
-  header{background:linear-gradient(135deg,#0d1117,#161b22);border-bottom:1px solid var(--border);padding:18px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;backdrop-filter:blur(8px);}
-  header h1{font-size:1.1rem;font-weight:600;display:flex;align-items:center;gap:10px;}
-  .logo{width:28px;height:28px;background:linear-gradient(135deg,#1f6feb,#388bfd);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;}
-  .status-pill{display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:.78rem;color:var(--muted);}
-  .dot{width:8px;height:8px;border-radius:50%;background:var(--approved);animation:pulse 2s ease-in-out infinite;}
-  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+/* ── Header ────────────────────────────────────────────── */
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 28px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:200;height:56px;}
+.logo{width:28px;height:28px;background:linear-gradient(135deg,#1f6feb,#388bfd);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;}
+.site-title{font-size:1rem;font-weight:600;white-space:nowrap;}
+.tab-nav{display:flex;gap:2px;margin-left:20px;border:1px solid var(--border);border-radius:8px;padding:3px;background:var(--surface2);}
+.tab-btn{padding:5px 16px;border:none;background:none;color:var(--muted);border-radius:6px;font-size:.82rem;font-weight:500;cursor:pointer;transition:background .15s,color .15s;white-space:nowrap;}
+.tab-btn.active{background:var(--accent);color:#fff;}
+.header-right{margin-left:auto;display:flex;align-items:center;gap:10px;}
+.theme-btn{padding:5px 14px;border:1px solid var(--border);border-radius:7px;background:var(--surface2);color:var(--text);font-size:.78rem;cursor:pointer;display:flex;align-items:center;gap:6px;transition:border-color .15s;}
+.theme-btn:hover{border-color:var(--accent);}
+.status-pill{display:flex;align-items:center;gap:7px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:5px 13px;font-size:.76rem;color:var(--muted);}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--approved);animation:pulse 2s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
 
-  /* ── Layout ── */
-  main{max-width:1260px;margin:0 auto;padding:28px 20px;}
+/* ── Tab content ───────────────────────────────────────── */
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+main{max-width:1280px;margin:0 auto;padding:24px 20px;}
 
-  /* ── Arch banner ── */
-  .arch-banner{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 24px;margin-bottom:24px;overflow-x:auto;}
-  .arch-banner h2{font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;}
-  .arch-flow{display:flex;align-items:center;gap:0;white-space:nowrap;}
-  .arch-box{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 14px;font-size:.78rem;text-align:center;min-width:110px;}
-  .arch-box .label{font-weight:600;}
-  .arch-box .sub{font-size:.66rem;color:var(--muted);margin-top:2px;}
-  .arch-box.hi{border-color:var(--accent);background:var(--accent-bg);}
-  .arch-box.hi .label{color:var(--accent);}
-  .arch-arrow{color:var(--muted);font-size:1rem;padding:0 5px;}
+/* ── Arch banner ───────────────────────────────────────── */
+.arch-banner{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 22px;margin-bottom:22px;overflow-x:auto;}
+.arch-banner h2,.section-title{font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;}
+.arch-flow{display:flex;align-items:center;white-space:nowrap;}
+.arch-box{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:8px 13px;font-size:.76rem;text-align:center;min-width:106px;}
+.arch-box .label{font-weight:600;}.arch-box .sub{font-size:.64rem;color:var(--muted);margin-top:2px;}
+.arch-box.hi{border-color:var(--accent);background:var(--accent-bg);}.arch-box.hi .label{color:var(--accent);}
+.arch-arrow{color:var(--muted);font-size:.95rem;padding:0 4px;}
 
-  /* ── Stats ── */
-  .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;}
-  .stat-box{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 18px;text-align:center;}
-  .stat-box .num{font-size:1.7rem;font-weight:700;line-height:1;margin-bottom:3px;}
-  .stat-box .lbl{font-size:.7rem;color:var(--muted);}
-  .stat-box.t .num{color:var(--accent);} .stat-box.a .num{color:var(--approved);} .stat-box.d .num{color:var(--declined);} .stat-box.r .num{color:var(--warning);}
+/* ── Stats ─────────────────────────────────────────────── */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px;}
+.stat-box{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 18px;text-align:center;}
+.stat-box .num{font-size:1.65rem;font-weight:700;line-height:1;margin-bottom:3px;}
+.stat-box .lbl{font-size:.68rem;color:var(--muted);}
+.stat-box.t .num{color:var(--accent);}.stat-box.a .num{color:var(--approved);}.stat-box.d .num{color:var(--declined);}.stat-box.r .num{color:var(--warning);}
 
-  /* ── Two-column body ── */
-  .body-grid{display:grid;grid-template-columns:1fr 380px;gap:20px;align-items:start;}
+/* ── Body grid ─────────────────────────────────────────── */
+.body-grid{display:grid;grid-template-columns:1fr 370px;gap:18px;align-items:start;}
+.section-title{margin-top:22px;margin-bottom:12px;}
 
-  /* ── LangGraph panel ── */
-  .lg-panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;position:sticky;top:76px;}
-  .lg-panel h2{font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:16px;}
+/* ── Cards ─────────────────────────────────────────────── */
+.scenarios-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:11px;overflow:hidden;transition:border-color .2s,transform .15s;}
+.card:hover{border-color:#58a6ff44;transform:translateY(-1px);}
+.card.approved{border-color:var(--approved);}.card.declined{border-color:var(--declined);}
+.card-header{padding:13px 17px 9px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
+.card-header .title{font-size:.88rem;font-weight:600;}.card-header .subtitle{font-size:.71rem;color:var(--muted);margin-top:2px;}
+.badge{font-size:.63rem;font-weight:600;padding:2px 7px;border-radius:4px;white-space:nowrap;background:var(--surface2);color:var(--muted);border:1px solid var(--border);}
+.card-params{padding:9px 17px;display:flex;flex-wrap:wrap;gap:6px;}
+.param{background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:3px 8px;font-size:.71rem;font-family:"SFMono-Regular",Consolas,monospace;color:var(--muted);}
+.param span{color:var(--text);font-weight:500;}
+.card-action{padding:0 17px 13px;}
+.btn-authorize{width:100%;padding:8px 0;background:linear-gradient(135deg,#1f6feb,#388bfd);color:#fff;border:none;border-radius:7px;font-size:.82rem;font-weight:600;cursor:pointer;transition:opacity .2s;}
+.btn-authorize:hover{opacity:.88;}.btn-authorize:disabled{opacity:.5;cursor:not-allowed;}
+.card-result{display:none;padding:13px 17px;border-top:1px solid var(--border);animation:fadeIn .3s ease;}
+.card-result.visible{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+.decision-row{display:flex;align-items:center;gap:7px;margin-bottom:9px;flex-wrap:wrap;}
+.decision-badge{font-size:.86rem;font-weight:700;padding:4px 11px;border-radius:5px;letter-spacing:.04em;}
+.decision-badge.APPROVED{background:var(--approved-bg);color:var(--approved);border:1px solid var(--approved);}
+.decision-badge.DECLINED{background:var(--declined-bg);color:var(--declined);border:1px solid var(--declined);}
+.auth-code{font-family:monospace;font-size:.8rem;color:var(--approved);background:var(--approved-bg);padding:3px 8px;border-radius:4px;border:1px solid var(--approved);}
+.decline-reason{font-size:.76rem;color:var(--declined);background:var(--declined-bg);padding:3px 8px;border-radius:4px;border:1px solid var(--declined);}
+.rc-badge{font-family:monospace;font-size:.66rem;padding:2px 6px;border-radius:4px;background:var(--surface2);border:1px solid var(--border);color:var(--muted);}
+.audit-label{font-size:.63rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:6px;}
+.audit-trail{display:flex;flex-direction:column;gap:4px;}
+.rule-row{display:flex;align-items:center;gap:6px;font-size:.74rem;}
+.rule-icon{width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0;}
+.rule-icon.pass{background:#238636;color:#fff;}.rule-icon.fired{background:var(--declined);color:#fff;}.rule-icon.skipped{background:var(--surface2);color:var(--muted);border:1px solid var(--border);}
+.rule-name{color:var(--text);}.rule-msg{color:var(--muted);font-size:.68rem;margin-left:auto;text-align:right;max-width:50%;}
 
-  /* Graph nodes */
-  .lg-graph{display:flex;flex-direction:column;align-items:center;gap:0;}
-  .lg-node{
-    width:100%;max-width:280px;
-    background:var(--node-idle);border:1.5px solid var(--border);
-    border-radius:8px;padding:9px 14px;
-    display:flex;align-items:center;gap:10px;
-    font-size:.8rem;transition:all .3s;
-  }
-  .lg-node .n-icon{width:22px;height:22px;border-radius:50%;background:var(--surface2);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;transition:all .3s;}
-  .lg-node .n-name{font-weight:600;color:var(--text);}
-  .lg-node .n-sub{font-size:.65rem;color:var(--muted);margin-top:1px;}
+/* ── LangGraph panel ────────────────────────────────────── */
+.lg-panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;position:sticky;top:64px;}
+.lg-panel h2{font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;}
+.lg-graph{display:flex;flex-direction:column;align-items:center;gap:0;}
+.lg-node{width:100%;max-width:270px;background:var(--node-idle);border:1.5px solid var(--border);border-radius:8px;padding:8px 13px;display:flex;align-items:center;gap:9px;font-size:.78rem;transition:all .3s;}
+.lg-node .n-icon{width:21px;height:21px;border-radius:50%;background:var(--surface2);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0;transition:all .3s;}
+.lg-node .n-name{font-weight:600;color:var(--text);font-size:.78rem;}
+.lg-node .n-sub{font-size:.63rem;color:var(--muted);margin-top:1px;}
+.lg-node.active{border-color:var(--node-active);background:var(--accent-bg);}
+.lg-node.active .n-icon{background:var(--node-active);border-color:var(--node-active);color:#fff;}
+.lg-node.active .n-name{color:var(--accent);}
+.lg-node.done-ok{border-color:var(--node-done-ok);background:var(--approved-bg);}
+.lg-node.done-ok .n-icon{background:var(--node-done-ok);border-color:var(--node-done-ok);color:#fff;}
+.lg-node.done-ok .n-name{color:var(--approved);}
+.lg-node.done-err{border-color:var(--node-done-err);background:var(--declined-bg);}
+.lg-node.done-err .n-icon{background:var(--node-done-err);border-color:var(--node-done-err);color:#fff;}
+.lg-node.done-err .n-name{color:var(--declined);}
+.lg-node.skipped{opacity:.3;}
+.lg-edge{width:2px;height:14px;background:var(--border);margin:0 auto;transition:background .3s;}
+.lg-edge.active{background:var(--node-active);}.lg-edge.done{background:var(--node-done-ok);}.lg-edge.err{background:var(--node-done-err);}
+.lg-fork{display:flex;align-items:center;gap:5px;margin:3px auto;font-size:.62rem;color:var(--muted);width:100%;max-width:270px;}
+.lg-fork .tag{background:var(--tag-bg);border:1px solid var(--tag-border);border-radius:3px;padding:1px 5px;color:var(--tag-text);}
+.path-summary{margin-top:12px;padding:9px 11px;background:var(--surface2);border:1px solid var(--border);border-radius:7px;font-size:.73rem;display:none;}
+.path-summary.visible{display:block;}
+.path-label{font-size:.62rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:4px;}
+.path-nodes{display:flex;flex-wrap:wrap;gap:3px;margin-top:5px;}
+.path-node{background:var(--surface);border:1px solid var(--border);border-radius:3px;padding:2px 6px;font-size:.66rem;font-family:monospace;}
+.path-node.visited{background:var(--accent-bg);border-color:var(--accent);color:var(--accent);}
+.path-node.terminal-ok{background:var(--approved-bg);border-color:var(--approved);color:var(--approved);}
+.path-node.terminal-err{background:var(--declined-bg);border-color:var(--declined);color:var(--declined);}
 
-  /* Active state */
-  .lg-node.active{border-color:var(--node-active);background:#0d1f3c;}
-  .lg-node.active .n-icon{background:var(--node-active);border-color:var(--node-active);color:#fff;}
-  .lg-node.active .n-name{color:var(--accent);}
+/* ── Custom form ────────────────────────────────────────── */
+.custom-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px 24px;margin-top:22px;}
+.custom-card h3{font-size:.9rem;font-weight:600;margin-bottom:3px;}
+.custom-card .desc{font-size:.74rem;color:var(--muted);margin-bottom:16px;}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:11px;margin-bottom:14px;}
+.form-field label{display:block;font-size:.66rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:4px;}
+.form-field input,.form-field select{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:7px 10px;color:var(--text);font-size:.82rem;font-family:inherit;outline:none;transition:border-color .15s;}
+.form-field input:focus,.form-field select:focus{border-color:var(--accent);}
+.form-field select option{background:var(--surface2);}
+.btn-custom{padding:8px 24px;background:linear-gradient(135deg,#1f6feb,#388bfd);color:#fff;border:none;border-radius:7px;font-size:.83rem;font-weight:600;cursor:pointer;transition:opacity .2s;}
+.btn-custom:hover{opacity:.88;}.btn-custom:disabled{opacity:.5;cursor:not-allowed;}
+#custom-result{margin-top:16px;display:none;animation:fadeIn .3s ease;}
+#custom-result.visible{display:block;}
 
-  /* Done OK */
-  .lg-node.done-ok{border-color:var(--node-done-ok);background:#0d2a14;}
-  .lg-node.done-ok .n-icon{background:var(--node-done-ok);border-color:var(--node-done-ok);color:#fff;}
-  .lg-node.done-ok .n-name{color:var(--approved);}
+/* ── Spinner ────────────────────────────────────────────── */
+.spinner{display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:5px;}
+@keyframes spin{to{transform:rotate(360deg);}}
 
-  /* Done ERR */
-  .lg-node.done-err{border-color:var(--node-done-err);background:#2a0d0d;}
-  .lg-node.done-err .n-icon{background:var(--node-done-err);border-color:var(--node-done-err);color:#fff;}
-  .lg-node.done-err .n-name{color:var(--declined);}
+/* ═══════════════════════════════════════════════════════════
+   CODE EXPLORER TAB
+═══════════════════════════════════════════════════════════ */
+.ce-main{max-width:1280px;margin:0 auto;padding:24px 20px;}
 
-  /* Skipped */
-  .lg-node.skipped{opacity:.35;}
+/* Section pill nav */
+.ce-nav{display:flex;gap:6px;margin-bottom:24px;flex-wrap:wrap;}
+.ce-nav-btn{padding:7px 18px;border:1px solid var(--border);border-radius:20px;background:var(--surface2);color:var(--muted);font-size:.82rem;font-weight:500;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:7px;}
+.ce-nav-btn:hover{border-color:var(--accent);color:var(--accent);}
+.ce-nav-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+.ce-nav-btn .ce-icon{font-size:1rem;}
 
-  /* Connector lines */
-  .lg-edge{width:2px;height:16px;background:var(--border);margin:0 auto;transition:background .3s;}
-  .lg-edge.active{background:var(--node-active);}
-  .lg-edge.done{background:var(--node-done-ok);}
-  .lg-edge.err{background:var(--node-done-err);}
+/* Section wrapper */
+.ce-section{display:none;animation:fadeIn .25s ease;}
+.ce-section.active{display:block;}
 
-  /* Conditional fork labels */
-  .lg-fork{display:flex;align-items:center;gap:6px;margin:4px auto;font-size:.65rem;color:var(--muted);}
-  .lg-fork .tag{background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:1px 6px;}
+/* Overview system diagram */
+.sys-diagram{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px 24px;margin-bottom:26px;}
+.sys-diagram h3{font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:16px;}
+.sys-flow{display:flex;flex-direction:column;align-items:center;gap:0;}
+.sys-box{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 20px;font-size:.82rem;font-weight:600;text-align:center;width:100%;max-width:480px;}
+.sys-box .s-sub{font-size:.7rem;color:var(--muted);font-weight:400;margin-top:2px;}
+.sys-box.accent{border-color:var(--accent);background:var(--accent-bg);color:var(--accent);}
+.sys-box.green{border-color:var(--approved);background:var(--approved-bg);color:var(--approved);}
+.sys-arrow{font-size:.8rem;color:var(--muted);padding:4px 0;text-align:center;}
+.sys-arrow .label{font-size:.64rem;color:var(--muted);}
 
-  /* Path summary */
-  .path-summary{margin-top:14px;padding:10px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;font-size:.75rem;color:var(--muted);display:none;}
-  .path-summary.visible{display:block;}
-  .path-summary .path-label{font-size:.65rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;}
-  .path-nodes{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;}
-  .path-node{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:2px 7px;font-size:.68rem;font-family:monospace;}
-  .path-node.visited{background:var(--accent-bg);border-color:var(--accent);color:var(--accent);}
-  .path-node.terminal-ok{background:#0d2a14;border-color:var(--approved);color:var(--approved);}
-  .path-node.terminal-err{background:#2a0d0d;border-color:var(--declined);color:var(--declined);}
+/* Split layout */
+.split{display:grid;grid-template-columns:38% 62%;gap:20px;align-items:start;}
+@media(max-width:900px){.split{grid-template-columns:1fr;}}
 
-  /* ── Section title ── */
-  .section-title{font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;margin-top:24px;}
+/* Explanation panel */
+.expl{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px 22px;}
+.expl h3{font-size:1.05rem;font-weight:700;margin-bottom:6px;}
+.expl .role-badge{display:inline-block;font-size:.68rem;font-weight:600;padding:2px 10px;border-radius:4px;background:var(--accent-bg);color:var(--accent);border:1px solid var(--accent);margin-bottom:12px;}
+.expl .what{font-size:.83rem;color:var(--muted);line-height:1.6;margin-bottom:16px;}
+.steps-title{font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;}
+.step{display:flex;gap:11px;margin-bottom:12px;align-items:flex-start;}
+.step-num{min-width:22px;height:22px;border-radius:50%;background:var(--step-num);color:#fff;font-size:.72rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.step-body{font-size:.82rem;line-height:1.55;color:var(--text);}
+.step-body strong{color:var(--accent);}
+.callout{background:var(--callout-bg);border-left:3px solid var(--callout-border);border-radius:0 6px 6px 0;padding:10px 14px;margin-top:16px;font-size:.8rem;line-height:1.55;}
+.callout .c-label{font-size:.62rem;text-transform:uppercase;letter-spacing:.07em;font-weight:700;color:var(--callout-border);margin-bottom:4px;}
 
-  /* ── Scenario cards ── */
-  .scenarios-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px;}
-  .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:border-color .2s,transform .15s;}
-  .card:hover{border-color:#58a6ff44;transform:translateY(-1px);}
-  .card.approved{border-color:var(--approved);} .card.declined{border-color:var(--declined);}
-  .card-header{padding:14px 18px 10px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
-  .card-header .title{font-size:.9rem;font-weight:600;}
-  .card-header .subtitle{font-size:.73rem;color:var(--muted);margin-top:2px;}
-  .badge{font-size:.65rem;font-weight:600;padding:3px 8px;border-radius:4px;white-space:nowrap;}
-  .badge.rule{background:var(--surface2);color:var(--muted);border:1px solid var(--border);}
-  .card-params{padding:10px 18px;display:flex;flex-wrap:wrap;gap:7px;}
-  .param{background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:3px 9px;font-size:.73rem;font-family:"SFMono-Regular",Consolas,monospace;color:var(--muted);}
-  .param span{color:var(--text);font-weight:500;}
-  .card-action{padding:0 18px 14px;}
-  .btn-authorize{width:100%;padding:9px 0;background:linear-gradient(135deg,#1f6feb,#388bfd);color:#fff;border:none;border-radius:7px;font-size:.83rem;font-weight:600;cursor:pointer;transition:opacity .2s,transform .1s;}
-  .btn-authorize:hover{opacity:.9;} .btn-authorize:active{transform:scale(.98);} .btn-authorize:disabled{opacity:.5;cursor:not-allowed;}
-  .card-result{display:none;padding:14px 18px;border-top:1px solid var(--border);animation:fadeIn .3s ease;}
-  @keyframes fadeIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
-  .card-result.visible{display:block;}
-  .decision-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
-  .decision-badge{font-size:.88rem;font-weight:700;padding:4px 12px;border-radius:5px;letter-spacing:.04em;}
-  .decision-badge.APPROVED{background:var(--approved-bg);color:var(--approved);border:1px solid var(--approved);}
-  .decision-badge.DECLINED{background:var(--declined-bg);color:var(--declined);border:1px solid var(--declined);}
-  .auth-code{font-family:monospace;font-size:.82rem;color:var(--approved);background:var(--approved-bg);padding:3px 9px;border-radius:4px;border:1px solid #238636;}
-  .decline-reason{font-size:.78rem;color:var(--declined);background:var(--declined-bg);padding:3px 9px;border-radius:4px;border:1px solid #6e1a18;}
-  .rc-badge{font-family:monospace;font-size:.68rem;padding:2px 6px;border-radius:4px;background:var(--surface2);border:1px solid var(--border);color:var(--muted);}
-  .audit-label{font-size:.65rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:7px;}
-  .audit-trail{display:flex;flex-direction:column;gap:4px;}
-  .rule-row{display:flex;align-items:center;gap:7px;font-size:.76rem;}
-  .rule-icon{width:17px;height:17px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0;}
-  .rule-icon.pass{background:var(--pass);color:#fff;} .rule-icon.fired{background:var(--declined);color:#fff;} .rule-icon.skipped{background:var(--surface2);color:var(--muted);border:1px solid var(--border);}
-  .rule-name{color:var(--text);}
-  .rule-msg{color:var(--muted);font-size:.7rem;margin-left:auto;text-align:right;max-width:50%;}
-
-  /* ── Custom form ── */
-  .custom-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:22px 26px;margin-top:24px;}
-  .custom-card h3{font-size:.92rem;font-weight:600;margin-bottom:3px;}
-  .custom-card .desc{font-size:.76rem;color:var(--muted);margin-bottom:18px;}
-  .form-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:12px;margin-bottom:16px;}
-  .form-field label{display:block;font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:5px;}
-  .form-field input,.form-field select{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:7px 11px;color:var(--text);font-size:.83rem;font-family:inherit;outline:none;transition:border-color .15s;}
-  .form-field input:focus,.form-field select:focus{border-color:var(--accent);}
-  .form-field select option{background:var(--surface2);}
-  .btn-custom{padding:9px 26px;background:linear-gradient(135deg,#1f6feb,#388bfd);color:#fff;border:none;border-radius:7px;font-size:.85rem;font-weight:600;cursor:pointer;transition:opacity .2s;}
-  .btn-custom:hover{opacity:.9;} .btn-custom:disabled{opacity:.5;cursor:not-allowed;}
-  #custom-result{margin-top:18px;display:none;animation:fadeIn .3s ease;}
-  #custom-result.visible{display:block;}
-
-  /* ── Spinner ── */
-  .spinner{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:5px;}
-  @keyframes spin{to{transform:rotate(360deg);}}
+/* Code panel */
+.code-panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.code-file-tabs{display:flex;border-bottom:1px solid var(--border);background:var(--surface2);overflow-x:auto;}
+.cft-btn{padding:8px 16px;border:none;background:none;color:var(--muted);font-size:.75rem;font-family:"SFMono-Regular",Consolas,monospace;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;transition:color .15s,border-color .15s;}
+.cft-btn.active{color:var(--accent);border-bottom-color:var(--accent);}
+.code-snippet{display:none;}
+.code-snippet.active{display:block;}
+.code-snippet pre{margin:0;border-radius:0;max-height:520px;overflow:auto;}
+.code-snippet pre code{font-size:.78rem;line-height:1.6;font-family:"SFMono-Regular",Consolas,monospace;padding:18px 20px !important;}
+/* override hljs background to use our surface */
+[data-theme="dark"]  .hljs{background:var(--surface) !important;}
+[data-theme="light"] .hljs{background:#f6f8fa !important;}
 </style>
 </head>
 <body>
 
+<!-- ── Header ─────────────────────────────────────────── -->
 <header>
-  <h1>
-    <div class="logo">AI</div>
-    Agentic AI + IBM ODM &nbsp;·&nbsp; Payment Authorization Demo
-  </h1>
-  <div class="status-pill">
-    <div class="dot" id="status-dot"></div>
-    <span id="status-text">Connecting…</span>
+  <div class="logo">AI</div>
+  <div class="site-title">Agentic AI + IBM ODM</div>
+
+  <nav class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab('dashboard',this)">Dashboard</button>
+    <button class="tab-btn"        onclick="switchTab('code',this)">Code Explorer</button>
+  </nav>
+
+  <div class="header-right">
+    <button class="theme-btn" id="theme-btn" onclick="toggleTheme()">
+      <span id="theme-icon">☀</span>
+      <span id="theme-label">Light</span>
+    </button>
+    <div class="status-pill">
+      <div class="dot" id="status-dot"></div>
+      <span id="status-text">Connecting…</span>
+    </div>
   </div>
 </header>
 
+<!-- ═══════════════════════════════ DASHBOARD TAB ═══════════════════════════ -->
+<div id="tab-dashboard" class="tab-content active">
 <main>
 
-  <!-- Architecture -->
   <div class="arch-banner">
     <h2>Architecture</h2>
     <div class="arch-flow">
@@ -185,17 +252,14 @@
       <div class="arch-arrow">&#8594;</div>
       <div class="arch-box hi"><div class="label">LangChain Agent</div><div class="sub">Azure OpenAI / GPT-4</div></div>
       <div class="arch-arrow">&#8594;</div>
-      <div class="arch-box"><div class="label">Intent Extraction</div><div class="sub">amount · card · MCC · country</div></div>
+      <div class="arch-box"><div class="label">Intent Extraction</div><div class="sub">amount · card · MCC</div></div>
       <div class="arch-arrow">&#8594;</div>
-      <div class="arch-box hi"><div class="label">IBM ODM RES</div><div class="sub">5-rule ruleflow · HTDS</div></div>
+      <div class="arch-box hi"><div class="label">IBM ODM RES</div><div class="sub">5-rule ruleflow</div></div>
       <div class="arch-arrow">&#8594;</div>
-      <div class="arch-box"><div class="label">Decision</div><div class="sub">APPROVED / DECLINED + audit</div></div>
-      <div class="arch-arrow">&#8594;</div>
-      <div class="arch-box"><div class="label">Agent Response</div><div class="sub">Plain-language answer</div></div>
+      <div class="arch-box"><div class="label">APPROVED / DECLINED</div><div class="sub">+ audit trail</div></div>
     </div>
   </div>
 
-  <!-- Stats -->
   <div class="stats-row">
     <div class="stat-box t"><div class="num" id="stat-total">0</div><div class="lbl">Transactions Run</div></div>
     <div class="stat-box a"><div class="num" id="stat-approved">0</div><div class="lbl">Approved</div></div>
@@ -203,30 +267,24 @@
     <div class="stat-box r"><div class="num">5</div><div class="lbl">Active ODM Rules</div></div>
   </div>
 
-  <!-- Two-column: scenarios + LangGraph panel -->
   <div class="body-grid">
-
-    <!-- Left: scenarios -->
     <div>
-      <div class="section-title">Preset Scenarios — click Authorize to run each through the LangGraph workflow + IBM ODM</div>
+      <div class="section-title">Preset Scenarios — authorize each through LangGraph + IBM ODM</div>
       <div class="scenarios-grid" id="scenarios-grid"></div>
 
-      <!-- Custom form -->
       <div class="custom-card">
         <h3>Custom Transaction</h3>
-        <p class="desc">Build your own payload — runs through the full LangGraph workflow then IBM ODM.</p>
+        <p class="desc">Build your own payload — runs the full LangGraph workflow then IBM ODM.</p>
         <div class="form-grid">
-          <div class="form-field"><label>Amount ($)</label><input type="number" id="f-amount" value="75.00" step="0.01" min="0"></div>
-          <div class="form-field"><label>Card Number</label><input type="text" id="f-card" value="4532015112830366" maxlength="16"></div>
-          <div class="form-field"><label>Merchant ID</label><input type="text" id="f-merchant" value="my_merchant_001"></div>
-          <div class="form-field"><label>MCC Code</label><input type="text" id="f-mcc" value="5812" maxlength="4"></div>
-          <div class="form-field"><label>Country (ISO)</label><input type="text" id="f-country" value="CA" maxlength="2"></div>
+          <div class="form-field"><label>Amount ($)</label><input type="number" id="f-amount" value="75.00" step="0.01"></div>
+          <div class="form-field"><label>Card Number</label><input type="text"   id="f-card"   value="4532015112830366" maxlength="16"></div>
+          <div class="form-field"><label>Merchant ID</label><input type="text"   id="f-merchant" value="my_merchant_001"></div>
+          <div class="form-field"><label>MCC Code</label><input type="text"      id="f-mcc"    value="5812" maxlength="4"></div>
+          <div class="form-field"><label>Country</label><input type="text"       id="f-country" value="CA" maxlength="2"></div>
           <div class="form-field"><label>Entry Mode</label>
             <select id="f-entry">
-              <option value="CHIP">CHIP</option>
-              <option value="NFC_CONTACTLESS">NFC_CONTACTLESS</option>
-              <option value="SWIPE">SWIPE</option>
-              <option value="MANUAL">MANUAL</option>
+              <option>CHIP</option><option>NFC_CONTACTLESS</option>
+              <option>SWIPE</option><option>MANUAL</option>
             </select>
           </div>
         </div>
@@ -235,20 +293,15 @@
       </div>
     </div>
 
-    <!-- Right: LangGraph panel -->
+    <!-- LangGraph panel -->
     <div class="lg-panel">
       <h2>LangGraph Workflow — Execution Trace</h2>
-
       <div class="lg-graph" id="lg-graph">
-
-        <!-- Node: extract_intent -->
         <div class="lg-node" id="lgn-extract_intent">
           <div class="n-icon" id="lgi-extract_intent">1</div>
           <div><div class="n-name">extract_intent</div><div class="n-sub">LLM → structured fields</div></div>
         </div>
         <div class="lg-edge" id="lge-0"></div>
-
-        <!-- Node: check_completeness -->
         <div class="lg-node" id="lgn-check_completeness">
           <div class="n-icon" id="lgi-check_completeness">2</div>
           <div><div class="n-name">check_completeness</div><div class="n-sub">router: all fields present?</div></div>
@@ -260,8 +313,6 @@
           <span class="tag" style="color:var(--declined)">missing → clarification</span>
         </div>
         <div class="lg-edge" id="lge-2"></div>
-
-        <!-- Node: validate_input -->
         <div class="lg-node" id="lgn-validate_input">
           <div class="n-icon" id="lgi-validate_input">3</div>
           <div><div class="n-name">validate_input</div><div class="n-sub">amount · card · ISO country</div></div>
@@ -273,82 +324,921 @@
           <span class="tag" style="color:var(--declined)">errors → format_error</span>
         </div>
         <div class="lg-edge" id="lge-4"></div>
-
-        <!-- Node: enrich_mcc -->
         <div class="lg-node" id="lgn-enrich_mcc">
           <div class="n-icon" id="lgi-enrich_mcc">4</div>
           <div><div class="n-name">enrich_mcc</div><div class="n-sub">infer ISO 18245 MCC if absent</div></div>
         </div>
         <div class="lg-edge" id="lge-5"></div>
-
-        <!-- Node: call_odm -->
         <div class="lg-node" id="lgn-call_odm">
           <div class="n-icon" id="lgi-call_odm">5</div>
           <div><div class="n-name">call_odm</div><div class="n-sub">POST → IBM ODM HTDS REST</div></div>
         </div>
         <div class="lg-edge" id="lge-6"></div>
-
-        <!-- Node: format_response -->
         <div class="lg-node" id="lgn-format_response">
           <div class="n-icon" id="lgi-format_response">6</div>
           <div><div class="n-name">format_response</div><div class="n-sub">ODM JSON → plain language</div></div>
         </div>
         <div class="lg-edge" id="lge-7"></div>
-
-        <!-- END -->
-        <div class="lg-node" id="lgn-END" style="justify-content:center;max-width:120px;background:var(--bg);border-style:dashed;">
-          <div class="n-name" style="font-size:.8rem;color:var(--muted)">END</div>
+        <div class="lg-node" id="lgn-END" style="justify-content:center;max-width:110px;background:var(--bg);border-style:dashed;">
+          <div class="n-name" style="font-size:.78rem;color:var(--muted)">END</div>
         </div>
-
       </div>
-
-      <!-- Path summary -->
       <div class="path-summary" id="path-summary">
         <div class="path-label">Execution path</div>
-        <div id="path-text" style="color:var(--text);font-size:.78rem;margin-bottom:6px;"></div>
+        <div id="path-text" style="color:var(--text);font-size:.76rem;margin-bottom:4px;"></div>
         <div class="path-nodes" id="path-nodes"></div>
       </div>
-
-    </div><!-- /right panel -->
-  </div><!-- /body-grid -->
-
+    </div>
+  </div>
 </main>
+</div><!-- /tab-dashboard -->
+
+
+<!-- ═══════════════════════════ CODE EXPLORER TAB ═══════════════════════════ -->
+<div id="tab-code" class="tab-content">
+<div class="ce-main">
+
+  <!-- Section nav -->
+  <nav class="ce-nav">
+    <button class="ce-nav-btn active" onclick="showSection('mcp',this)">
+      <span class="ce-icon">🔌</span> MCP Server
+    </button>
+    <button class="ce-nav-btn" onclick="showSection('langchain',this)">
+      <span class="ce-icon">⛓</span> LangChain Agent
+    </button>
+    <button class="ce-nav-btn" onclick="showSection('langgraph',this)">
+      <span class="ce-icon">🔀</span> LangGraph Workflow
+    </button>
+    <button class="ce-nav-btn" onclick="showSection('odm',this)">
+      <span class="ce-icon">⚖</span> IBM ODM
+    </button>
+  </nav>
+
+  <!-- ── MCP Server section ────────────────────────────── -->
+  <div id="sec-mcp" class="ce-section active">
+    <div class="split">
+      <div class="expl">
+        <div class="role-badge">Protocol Layer</div>
+        <h3>MCP Server</h3>
+        <p class="what">
+          Model Context Protocol (MCP) is Anthropic's open standard for connecting AI
+          assistants to external tools and data. Think of it as USB-C for AI —
+          any MCP client (Claude Desktop, custom agents) can discover and call any MCP server's
+          tools without custom glue code.
+        </p>
+        <div class="steps-title">How it works</div>
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>FastMCP instance</strong> — one line creates the server and registers its name.</div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>@mcp.tool()</strong> — decorates any Python function as an LLM-callable tool. The docstring becomes the description the LLM reads to decide <em>when</em> to call it.</div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Type hints are the schema</strong> — MCP auto-generates the JSON schema from Python types. No manual schema writing needed.</div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>@mcp.resource()</strong> — exposes read-only context (like rule summaries) the LLM can fetch before deciding what to do.</div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-body"><strong>mcp.run()</strong> — starts the server. Default transport is stdio, so Claude Desktop spawns it as a subprocess. HTTP transport is also available.</div></div>
+        <div class="callout">
+          <div class="c-label">Key Insight</div>
+          The AI decides <em>when</em> to call the tool. MCP just handles the transport,
+          schema negotiation, and result passing. IBM ODM never knows or cares that an
+          AI called it — it just sees a standard HTTP request.
+        </div>
+      </div>
+      <div class="code-panel">
+        <div class="code-file-tabs">
+          <button class="cft-btn active" onclick="showCode('mcp','server')">mcp_odm_server.py</button>
+          <button class="cft-btn"        onclick="showCode('mcp','config')">claude_desktop_config.json</button>
+        </div>
+        <div class="code-snippet active" id="code-mcp-server"><pre><code class="language-python" id="c-mcp-server"></code></pre></div>
+        <div class="code-snippet"        id="code-mcp-config"><pre><code class="language-json"   id="c-mcp-config"></code></pre></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── LangChain Agent section ───────────────────────── -->
+  <div id="sec-langchain" class="ce-section">
+    <div class="split">
+      <div class="expl">
+        <div class="role-badge">Orchestration Layer</div>
+        <h3>LangChain Agent</h3>
+        <p class="what">
+          LangChain connects LLMs to tools and orchestrates the reasoning loop.
+          The agent pattern lets GPT-4 read a user message, decide which tool to call
+          and with what arguments, receive the result, and compose a final answer —
+          all in one automated loop.
+        </p>
+        <div class="steps-title">How it works</div>
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>@tool decorator</strong> wraps a Python function. The docstring + type hints become a JSON schema. GPT-4 sees this schema and decides when to invoke it.</div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>ChatPromptTemplate</strong> defines the agent's identity and task. The <code>agent_scratchpad</code> placeholder is where the LLM's tool calls and their results accumulate.</div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>create_openai_tools_agent</strong> binds the LLM, tools, and prompt into a single runnable.</div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>AgentExecutor</strong> runs the loop: LLM → decides to call tool → executes tool → LLM sees result → decides to answer or call another tool.</div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-body"><strong>temperature=0</strong> makes extraction deterministic. For payment data, you don't want creative variation in how amounts are parsed.</div></div>
+        <div class="callout">
+          <div class="c-label">Key Insight</div>
+          The agent never hard-codes "extract amount then call ODM". It just sees the
+          user's message and the tool schema, and <em>reasons</em> its way to calling
+          <code>authorize_payment</code> with the right arguments.
+        </div>
+      </div>
+      <div class="code-panel">
+        <div class="code-file-tabs">
+          <button class="cft-btn active" onclick="showCode('lc','tool')">odm_tool.py — @tool</button>
+          <button class="cft-btn"        onclick="showCode('lc','agent')">agent.py — AgentExecutor</button>
+          <button class="cft-btn"        onclick="showCode('lc','run')">main.py — invocation</button>
+        </div>
+        <div class="code-snippet active" id="code-lc-tool"><pre><code  class="language-python" id="c-lc-tool"></code></pre></div>
+        <div class="code-snippet"        id="code-lc-agent"><pre><code class="language-python" id="c-lc-agent"></code></pre></div>
+        <div class="code-snippet"        id="code-lc-run"><pre><code   class="language-python" id="c-lc-run"></code></pre></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── LangGraph section ─────────────────────────────── -->
+  <div id="sec-langgraph" class="ce-section">
+    <div class="split">
+      <div class="expl">
+        <div class="role-badge">Workflow Layer</div>
+        <h3>LangGraph StateGraph</h3>
+        <p class="what">
+          LangGraph turns a LangChain agent into a structured, auditable workflow.
+          Instead of an opaque "agent loop", you define explicit nodes, typed state,
+          and conditional edges — so you can see exactly which path each transaction took.
+        </p>
+        <div class="steps-title">How it works</div>
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>TypedDict state</strong> — every field the workflow reads or writes is declared up-front. <code>Annotated[list, operator.add]</code> means the field is appended to, not replaced, on each node update.</div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Nodes are pure functions</strong> — each takes the full state and returns a partial update dict. LangGraph merges the update into state automatically.</div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Conditional edges</strong> — a router function reads state and returns a string (the name of the next node). This is how the workflow branches on validation errors or missing fields.</div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>compile()</strong> validates the graph and returns a Runnable you call with <code>.invoke(initial_state)</code>.</div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-body"><strong>step_trace</strong> accumulates node names as the graph runs, giving a full execution audit trail — which is exactly what the Dashboard panel animates.</div></div>
+        <div class="callout">
+          <div class="c-label">Key Insight</div>
+          Unlike a plain agent loop, the graph is deterministic and inspectable.
+          You can checkpoint it, replay it, add human-in-the-loop nodes, or
+          stream intermediate state — none of which are possible with a black-box agent.
+        </div>
+      </div>
+      <div class="code-panel">
+        <div class="code-file-tabs">
+          <button class="cft-btn active" onclick="showCode('lg','state')">State definition</button>
+          <button class="cft-btn"        onclick="showCode('lg','node')">Node + router</button>
+          <button class="cft-btn"        onclick="showCode('lg','graph')">Build the graph</button>
+          <button class="cft-btn"        onclick="showCode('lg','run')">Invoke</button>
+        </div>
+        <div class="code-snippet active" id="code-lg-state"><pre><code class="language-python" id="c-lg-state"></code></pre></div>
+        <div class="code-snippet"        id="code-lg-node"><pre><code  class="language-python" id="c-lg-node"></code></pre></div>
+        <div class="code-snippet"        id="code-lg-graph"><pre><code class="language-python" id="c-lg-graph"></code></pre></div>
+        <div class="code-snippet"        id="code-lg-run"><pre><code   class="language-python" id="c-lg-run"></code></pre></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── IBM ODM section ───────────────────────────────── -->
+  <div id="sec-odm" class="ce-section">
+    <div class="split">
+      <div class="expl">
+        <div class="role-badge">Decision Layer</div>
+        <h3>IBM ODM Integration</h3>
+        <p class="what">
+          IBM Operational Decision Manager is an enterprise Business Rule Management
+          System (BRMS). Rules are authored in near-plain-English BAL inside Decision
+          Center, deployed to the Rule Execution Server, and called via HTDS REST.
+          This is the deterministic, auditable layer the AI cannot replace.
+        </p>
+        <div class="steps-title">How it works</div>
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>BOM (Business Object Model)</strong> — Java domain classes (<code>TransactionRequest</code>, <code>AuthorizationResponse</code>) form the vocabulary rules are written against.</div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>BAL rules</strong> — written in Decision Center in near-plain English. Business analysts can read and change them without touching code.</div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Ruleflow</strong> — rules execute sequentially. The first rule that fires <code>DECLINED</code> short-circuits the rest — same as the mock in this project.</div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>HTDS REST endpoint</strong> — the <code>@Path("/api/authorize") @POST</code> JAX-RS endpoint accepts JSON, runs the ruleflow via <code>IlrStatelessSession</code>, returns the result.</div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-body"><strong>Audit trail</strong> — every fired rule is captured in <code>AuthorizationResponse.auditTrail</code>. This is the compliance evidence regulators need.</div></div>
+        <div class="callout">
+          <div class="c-label">Key Insight</div>
+          The AI agent handles <em>ambiguity</em> (what did the user mean?).
+          IBM ODM handles <em>compliance</em> (is this allowed?).
+          Neither can replace the other: the AI can't be audited, and ODM can't read natural language.
+        </div>
+      </div>
+      <div class="code-panel">
+        <div class="code-file-tabs">
+          <button class="cft-btn active" onclick="showCode('odm','python')">Python → ODM call</button>
+          <button class="cft-btn"        onclick="showCode('odm','java')">Java HTDS endpoint</button>
+          <button class="cft-btn"        onclick="showCode('odm','bal')">BAL rules</button>
+          <button class="cft-btn"        onclick="showCode('odm','response')">Response JSON</button>
+        </div>
+        <div class="code-snippet active" id="code-odm-python"><pre><code class="language-python" id="c-odm-python"></code></pre></div>
+        <div class="code-snippet"        id="code-odm-java"><pre><code   class="language-java"   id="c-odm-java"></code></pre></div>
+        <div class="code-snippet"        id="code-odm-bal"><pre><code    class="language-plaintext" id="c-odm-bal"></code></pre></div>
+        <div class="code-snippet"        id="code-odm-response"><pre><code class="language-json" id="c-odm-response"></code></pre></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /ce-main -->
+</div><!-- /tab-code -->
+
 
 <script>
+/* ══════════════════════════════════════════════════════════
+   THEME
+══════════════════════════════════════════════════════════ */
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  const next = isDark ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  document.getElementById('theme-icon').textContent  = isDark ? '🌙' : '☀';
+  document.getElementById('theme-label').textContent = isDark ? 'Dark' : 'Light';
+  document.getElementById('hljs-theme').href = isDark
+    ? 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css'
+    : 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css';
+  localStorage.setItem('theme', next);
+}
+(function() {
+  const saved = localStorage.getItem('theme') || 'dark';
+  if (saved === 'light') toggleTheme();
+})();
+
+/* ══════════════════════════════════════════════════════════
+   TAB SWITCHING
+══════════════════════════════════════════════════════════ */
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+  if (name === 'code') initCodeBlocks();
+}
+
+/* ══════════════════════════════════════════════════════════
+   CODE SECTION SWITCHING
+══════════════════════════════════════════════════════════ */
+function showSection(name, btn) {
+  document.querySelectorAll('.ce-section').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.ce-nav-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('sec-' + name).classList.add('active');
+  btn.classList.add('active');
+}
+function showCode(section, file) {
+  const panel = document.querySelector(`#sec-${section} .code-panel`);
+  panel.querySelectorAll('.code-snippet').forEach(el => el.classList.remove('active'));
+  panel.querySelectorAll('.cft-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById(`code-${section}-${file}`).classList.add('active');
+  event.target.classList.add('active');
+}
+
+/* ══════════════════════════════════════════════════════════
+   CODE CONTENT — inserted via textContent so no HTML escaping needed
+══════════════════════════════════════════════════════════ */
+let _codeInitDone = false;
+function initCodeBlocks() {
+  if (_codeInitDone) return;
+  _codeInitDone = true;
+
+  const blocks = {
+
+/* ── MCP server ──────────────────────────────────────────────────────────── */
+'c-mcp-server': `\
+from mcp.server.fastmcp import FastMCP
+import requests
+import os
+
+# 1. Create the MCP server — one instance, one name
+mcp = FastMCP("IBM ODM Payment Authorization")
+
+ODM_ENDPOINT = os.getenv("ODM_ENDPOINT", "http://localhost:9090/api/authorize")
+
+
+# 2. @mcp.tool() — registers a Python function as an LLM-callable tool.
+#    The docstring becomes the description the LLM reads.
+#    Type hints become the JSON schema.  No manual schema writing.
+@mcp.tool()
+def authorize_payment(
+    amount: float,          # LLM extracts from NL: "4.50"
+    card_number: str,       # LLM extracts: "...4532" → padded
+    merchant_id: str,       # LLM extracts: "java_joe_coffee"
+    mcc: str,               # LLM infers:   "5812" (restaurants)
+    country: str,           # LLM extracts: "CA"
+    entry_mode: str = "CHIP",
+) -> dict:
+    """
+    Authorize a payment transaction via IBM ODM Rule Execution Server.
+    Returns decision (APPROVED/DECLINED), ISO 8583 response code,
+    and full audit trail of all rules evaluated.
+    """
+    payload = {
+        "transactionAmount": amount,
+        "cardNumber": card_number,
+        "merchantId": merchant_id,
+        "mcc": mcc,
+        "country": country,
+        "entryMode": entry_mode,
+    }
+    r = requests.post(ODM_ENDPOINT, json=payload, timeout=5)
+    r.raise_for_status()
+    return r.json()          # ← LLM sees this result and formats the answer
+
+
+# 3. @mcp.resource() — read-only context the LLM can fetch before acting
+@mcp.resource("odm://rules/summary")
+def get_rules_summary() -> str:
+    """Returns a plain-English summary of the active ODM ruleflow."""
+    return """
+    Active ruleflow (5 rules, sequential, short-circuit):
+    1. AmountLimitRule      — Decline if amount > $10,000 CAD
+    2. CountryBlacklistRule — Decline if OFAC-sanctioned country
+    3. MCCRestrictionRule   — Decline MCC 7995/9754 (gambling/lottery)
+    4. CardValidityRule     — Decline if Luhn check fails
+    5. ContactlessLimitRule — Decline NFC > $250 CAD
+    """
+
+
+# 4. Run the server (stdio transport for Claude Desktop)
+#    For HTTP transport:  mcp.run(transport="http", host="0.0.0.0", port=8000)
+if __name__ == "__main__":
+    mcp.run()
+`,
+
+'c-mcp-config': `\
+// Add to ~/Library/Application Support/Claude/claude_desktop_config.json
+// (Windows: %APPDATA%\\Claude\\claude_desktop_config.json)
+{
+  "mcpServers": {
+    "odm-payment": {
+      "command": "python",
+      "args": [
+        "C:/path/to/Agentic_IMBODM/mcp_odm_server.py"
+      ],
+      "env": {
+        "ODM_ENDPOINT": "http://localhost:9090/api/authorize"
+      }
+    }
+  }
+}
+
+// After restarting Claude Desktop, the authorize_payment tool
+// appears in the tool picker. Claude can then call IBM ODM
+// directly from a conversation — no custom UI needed.
+`,
+
+/* ── LangChain ───────────────────────────────────────────────────────────── */
+'c-lc-tool': `\
+# odm_tool.py — wraps the ODM HTTP call as a LangChain tool
+import os
+import requests
+from langchain.tools import tool
+from dotenv import load_dotenv
+
+load_dotenv()
+ODM_ENDPOINT = os.getenv("ODM_ENDPOINT", "http://localhost:9090/api/authorize")
+
+
+# @tool turns a plain Python function into an LLM-callable tool.
+#
+# What the LLM sees (auto-generated from the function):
+# {
+#   "name": "authorize_payment",
+#   "description": "Calls IBM ODM to authorize a payment...",
+#   "parameters": {
+#     "amount": {"type": "number"},
+#     "card_number": {"type": "string"},
+#     ...
+#   }
+# }
+@tool
+def authorize_payment(
+    amount: float,
+    card_number: str,
+    merchant_id: str,
+    merchant_category_code: str,
+    country: str,
+    entry_mode: str = "CHIP",
+) -> dict:
+    """
+    Calls IBM ODM Rule Execution Server to authorize a payment.
+    Returns decision (APPROVED/DECLINED), response code, and audit trail.
+
+    Use this whenever a user wants to make a payment or check if a
+    transaction would be approved.
+    """
+    payload = {
+        "transactionAmount": amount,
+        "cardNumber": card_number,
+        "merchantId": merchant_id,
+        "mcc": merchant_category_code,
+        "country": country,
+        "entryMode": entry_mode,
+    }
+    try:
+        response = requests.post(ODM_ENDPOINT, json=payload, timeout=5)
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.ConnectionError:
+        return {"error": "ODM server unreachable. Start: uvicorn mock_odm_server:app --port 9090"}
+`,
+
+'c-lc-agent': `\
+# agent.py — wires LLM + tool + prompt into an AgentExecutor
+import os
+from dotenv import load_dotenv
+from langchain_openai import AzureChatOpenAI
+from langchain.agents import AgentExecutor, create_openai_tools_agent
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from odm_tool import authorize_payment
+
+load_dotenv()
+
+# temperature=0 → deterministic extraction. No creative variation
+# in how "$4.50" or "card ending in 4532" gets parsed.
+llm = AzureChatOpenAI(
+    azure_deployment=os.getenv("AZURE_OPENAI_DEPLOYMENT", "gpt-4"),
+    api_version=os.getenv("AZURE_OPENAI_API_VERSION", "2024-02-01"),
+    temperature=0,
+)
+
+tools = [authorize_payment]
+
+# The system message defines the agent's identity and task.
+# agent_scratchpad is where tool calls + results accumulate
+# so the LLM can see them in subsequent turns.
+prompt = ChatPromptTemplate.from_messages([
+    ("system", """You are a payment authorization assistant for a Canadian bank.
+
+When a user wants to make a payment:
+1. Extract: amount, merchant, card details, country (default CA)
+2. Infer the merchant's ISO 18245 MCC code from context
+3. Call authorize_payment with all extracted fields
+4. Explain the decision in clear, friendly language
+
+If only last-4 digits given, pad card to 16: 000000000000<last4>
+Always include auth code (approved) or specific reason (declined)."""),
+    MessagesPlaceholder("chat_history", optional=True),
+    ("human", "{input}"),
+    MessagesPlaceholder("agent_scratchpad"),  # ← tool calls accumulate here
+])
+
+# Binds LLM + tools + prompt into a single runnable
+agent = create_openai_tools_agent(llm, tools, prompt)
+
+# AgentExecutor manages the loop:
+# LLM → (maybe) call tool → get result → LLM → answer
+agent_executor = AgentExecutor(
+    agent=agent,
+    tools=tools,
+    verbose=True,   # prints each tool call + result to stdout
+)
+`,
+
+'c-lc-run': `\
+# main.py — invoke the agent with a natural-language message
+from agent import agent_executor
+
+# The agent loop runs like this:
+#
+# Round 1:  User message → LLM
+#           LLM decides to call authorize_payment
+#           Arguments extracted: amount=4.50, card="0000000000004532"
+#                                merchant_id="java_joe_coffee",
+#                                merchant_category_code="5812",
+#                                country="CA", entry_mode="NFC_CONTACTLESS"
+#
+# Round 2:  authorize_payment() runs → calls ODM → gets {"decision":"APPROVED",...}
+#           LLM sees the tool result in agent_scratchpad
+#           LLM composes the final answer
+#
+result = agent_executor.invoke({
+    "input": "I want to pay $4.50 at Java Joe Coffee with my card ending in 4532."
+})
+print(result["output"])
+# → "Your $4.50 payment at Java Joe Coffee was approved.
+#    Authorization code: B7964F."
+
+# Declined example:
+result2 = agent_executor.invoke({
+    "input": "Pay 200 USD at a hotel in Moscow, Russia. Card: 5500005555555559."
+})
+print(result2["output"])
+# → "Your $200.00 payment at the Moscow hotel was declined.
+#    The merchant's country (Russia) is restricted under OFAC sanctions."
+`,
+
+/* ── LangGraph ───────────────────────────────────────────────────────────── */
+'c-lg-state': `\
+# langgraph_workflow.py — State definition
+from typing import TypedDict, Annotated, Optional
+from operator import add as list_add
+
+# TypedDict gives the graph type safety.
+# Every field every node can read or write is declared here.
+class PaymentState(TypedDict):
+    messages:          list          # conversation history (LangChain messages)
+    raw_input:         str           # original NL user message
+    extracted:         dict          # fields extracted by LLM or passed directly
+                                     # keys: amount, card_number, merchant_id,
+                                     #        mcc, country, entry_mode
+    missing_fields:    list[str]     # fields check_completeness found absent
+    validation_errors: list[str]     # errors validate_input found
+    odm_response:      Optional[dict]  # raw JSON back from IBM ODM
+    final_answer:      str           # plain-language answer for the user
+
+    # Annotated with operator.add means: when a node returns
+    # {"step_trace": ["validate_input"]}, LangGraph APPENDS it
+    # to the existing list instead of replacing it.
+    # This builds the execution trail across all nodes automatically.
+    step_trace: Annotated[list[str], list_add]
+`,
+
+'c-lg-node': `\
+# langgraph_workflow.py — A node and its routing function
+
+# ── Node: validate_input ─────────────────────────────────
+# Every node signature: (state: PaymentState) -> dict
+# The returned dict is a PARTIAL state update — only changed fields.
+def validate_input_node(state: PaymentState) -> dict:
+    e = state["extracted"]
+    errors: list[str] = []
+
+    # Business validation — amount must be positive
+    try:
+        if float(e.get("amount", 0)) <= 0:
+            errors.append("Amount must be greater than zero")
+    except (TypeError, ValueError):
+        errors.append("Amount is not a valid number")
+
+    # Card must be at least 4 digits
+    card = str(e.get("card_number", "")).replace(" ", "")
+    if not card.isdigit() or len(card) < 4:
+        errors.append("Card number must contain at least 4 digits")
+
+    # Country must be 2-letter ISO code
+    country = str(e.get("country", "")).upper()
+    if len(country) != 2 or not country.isalpha():
+        errors.append("Country must be a valid 2-letter ISO code (e.g. CA, US)")
+
+    # step_trace uses list_add reducer → "validate_input" is APPENDED
+    return {
+        "validation_errors": errors,
+        "step_trace": ["validate_input"],
+    }
+
+
+# ── Routing function ─────────────────────────────────────
+# Returns the NAME of the next node as a string.
+# add_conditional_edges("validate_input", _route_validation)
+# will call this function with the current state after the node runs.
+def _route_validation(state: PaymentState) -> str:
+    if state["validation_errors"]:
+        return "format_error"   # ← short-circuit to error handler
+    return "enrich_mcc"         # ← continue the happy path
+`,
+
+'c-lg-graph': `\
+# langgraph_workflow.py — Building and compiling the graph
+from langgraph.graph import StateGraph, START, END
+
+def build_workflow():
+    g = StateGraph(PaymentState)
+
+    # 1. Register nodes — each node is a Python function
+    g.add_node("extract_intent",        extract_intent_node)
+    g.add_node("check_completeness",    check_completeness_node)
+    g.add_node("request_clarification", request_clarification_node)
+    g.add_node("validate_input",        validate_input_node)
+    g.add_node("format_error",          format_error_node)
+    g.add_node("enrich_mcc",            enrich_mcc_node)
+    g.add_node("call_odm",              call_odm_node)
+    g.add_node("format_response",       format_response_node)
+
+    # 2. Fixed edges — always go to the next node
+    g.add_edge(START,                   "extract_intent")
+    g.add_edge("extract_intent",        "check_completeness")
+    g.add_edge("request_clarification", END)   # terminal: ask for more info
+    g.add_edge("format_error",          END)   # terminal: validation failed
+    g.add_edge("enrich_mcc",            "call_odm")
+    g.add_edge("call_odm",              "format_response")
+    g.add_edge("format_response",       END)   # terminal: happy path done
+
+    # 3. Conditional edges — call a router function to pick the next node
+    g.add_conditional_edges(
+        "check_completeness",
+        _route_completeness,        # returns "request_clarification" or "validate_input"
+    )
+    g.add_conditional_edges(
+        "validate_input",
+        _route_validation,          # returns "format_error" or "enrich_mcc"
+    )
+
+    # 4. compile() validates the graph and returns a Runnable
+    return g.compile()
+`,
+
+'c-lg-run': `\
+# Invoking the compiled workflow
+from langgraph_workflow import run_workflow, run_workflow_from_fields
+
+# ── Full NL mode (needs Azure OpenAI / Ollama) ───────────
+result = run_workflow(
+    "Pay $4.50 at Java Joe Coffee Shop with my card ending in 4532."
+)
+print(result["step_trace"])
+# → ['extract_intent', 'check_completeness',
+#    'validate_input', 'enrich_mcc', 'call_odm', 'format_response']
+print(result["final_answer"])
+# → "Your $4.50 payment at Java Joe was approved. Auth: B7964F."
+
+# ── Pre-extracted fields (no LLM — used by web dashboard) ─
+result2 = run_workflow_from_fields({
+    "amount": 350,
+    "card_number": "4532015112830366",
+    "merchant_id": "best_buy_electronics",
+    "mcc": "5732",
+    "country": "CA",
+    "entry_mode": "NFC_CONTACTLESS",      # ← triggers ContactlessLimitRule
+})
+print(result2["step_trace"])
+# → ['validate_input', 'enrich_mcc', 'call_odm', 'format_response']
+print(result2["final_answer"])
+# → "Your $350.00 payment was declined.
+#    Reason: Contactless limit exceeded ($350.00 > $250)..."
+
+# ── Validation error path ────────────────────────────────
+result3 = run_workflow_from_fields({
+    "amount": 0,               # ← triggers validate_input → format_error
+    "card_number": "4532015112830366",
+    "merchant_id": "shop", "mcc": "5999", "country": "CA",
+})
+print(result3["step_trace"])
+# → ['validate_input', 'format_error']    ← short-circuits at node 2
+`,
+
+/* ── IBM ODM ─────────────────────────────────────────────────────────────── */
+'c-odm-python': `\
+# How Python calls IBM ODM — from odm_tool.py and call_odm_node
+
+import requests
+
+ODM_ENDPOINT = "http://odm-server:9090/api/authorize"
+
+# Structured payload — this is the IBM BOM TransactionRequest object
+# serialized to JSON by the HTDS REST framework
+payload = {
+    "transactionAmount": 4.50,
+    "cardNumber":  "4532015112830366",
+    "merchantId":  "java_joe_001",
+    "mcc":         "5812",    # ISO 18245 — Eating Places, Restaurants
+    "country":     "CA",      # ISO 3166-1 alpha-2
+    "entryMode":   "NFC_CONTACTLESS",
+    "currency":    "CAD",
+}
+
+response = requests.post(ODM_ENDPOINT, json=payload, timeout=5)
+result = response.json()
+
+# ── Result structure ─────────────────────────────────────
+# {
+#   "decision":          "APPROVED",
+#   "responseCode":      "00",         # ISO 8583
+#   "authorizationCode": "B7964F",
+#   "declineReason":     null,
+#   "auditTrail": [
+#     { "ruleName": "AmountLimitRule",      "result": "PASS",
+#       "fired": false, "message": "Amount $4.50 within $10,000 limit" },
+#     { "ruleName": "CountryBlacklistRule", "result": "PASS", ... },
+#     { "ruleName": "MCCRestrictionRule",   "result": "PASS", ... },
+#     { "ruleName": "CardValidityRule",     "result": "PASS", ... },
+#     { "ruleName": "ContactlessLimitRule", "result": "PASS", ... }
+#   ]
+# }
+`,
+
+'c-odm-java': `\
+// PaymentAuthorizationResource.java
+// The JAX-RS endpoint deployed on IBM Rule Execution Server (Liberty / WebSphere)
+// This is what Python calls via HTTP POST.
+
+package com.bank.odm.rest;
+
+import ilog.rules.res.session.*;
+import ilog.rules.res.model.IlrPath;
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+
+@Path("/api/authorize")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
+public class PaymentAuthorizationResource {
+
+    // RuleApp path — matches the deployment name in Decision Center
+    private static final String RULEAPP_PATH =
+        "/PaymentAuthorizationRuleApp/1.0/PaymentAuthorizationRuleset/1.0";
+
+    @POST
+    public AuthorizationResponse authorize(TransactionRequest request) {
+        try {
+            // 1. Get a stateless session from the Rule Execution Server
+            IlrJ2SESessionFactory factory = new IlrJ2SESessionFactory();
+            IlrStatelessSession session = factory.createStatelessSession();
+
+            // 2. Build the ruleset request
+            IlrSessionRequest sessionRequest = factory.createRequest();
+            sessionRequest.setRulesetPath(IlrPath.parsePath(RULEAPP_PATH));
+
+            // 3. Bind input objects to ruleflow parameters
+            //    Rules reference "the transaction" and "the response"
+            AuthorizationResponse response = new AuthorizationResponse();
+            sessionRequest.setInputParameter("transaction", request);
+            sessionRequest.setInputParameter("response", response);
+
+            // 4. Execute — runs all 5 rules, short-circuits on DECLINED
+            IlrSessionResponse sessionResponse = session.execute(sessionRequest);
+
+            // 5. Output parameters contain the populated response object
+            return (AuthorizationResponse)
+                sessionResponse.getOutputParameters().get("response");
+
+        } catch (Exception e) {
+            AuthorizationResponse err = new AuthorizationResponse();
+            err.setDecision("ERROR");
+            err.setResponseCode("96"); // ISO 8583 — System malfunction
+            err.setDeclineReason("Rule engine error: " + e.getMessage());
+            return err;
+        }
+    }
+}
+`,
+
+'c-odm-bal': `\
+// PaymentAuthorizationRules.brl
+// Written in BAL (Business Action Language) inside IBM Decision Center.
+// Business analysts can read, test, and change these rules without Java.
+
+// ── Rule 1 ───────────────────────────────────────────────
+rule "Decline if transaction exceeds single-payment limit"
+    when
+        the transaction amount of the transaction is more than 10000
+    then
+        set the decision of the response to "DECLINED" ;
+        set the response code of the response to "05" ;
+        set the decline reason of the response to
+            "Transaction amount exceeds the $10,000 single-payment limit" ;
+        add a new rule trace to the audit trail of the response where
+            the rule name is "AmountLimitRule" ,
+            fired is true ,
+            the result is "DECLINED" ;
+end
+
+// ── Rule 2 ───────────────────────────────────────────────
+rule "Decline if merchant country is OFAC-sanctioned"
+    when
+        the country of the transaction
+            is in { "KP" , "IR" , "CU" , "SY" , "RU" , "BY" }
+    then
+        set the decision of the response to "DECLINED" ;
+        set the response code of the response to "05" ;
+        set the decline reason of the response to
+            "Merchant country is restricted under OFAC sanctions" ;
+        add a new rule trace to the audit trail of the response where
+            the rule name is "CountryBlacklistRule" ,
+            fired is true ,
+            the result is "DECLINED" ;
+end
+
+// ── Rule 3 ───────────────────────────────────────────────
+rule "Decline restricted merchant category codes"
+    when
+        the mcc of the transaction is in { "7995" , "9754" }
+    then
+        set the decision of the response to "DECLINED" ;
+        set the response code of the response to "57" ;
+        set the decline reason of the response to
+            "Merchant category is not permitted on this card" ;
+end
+
+// ── Rule 5 (contactless PCI limit) ───────────────────────
+rule "Decline contactless transaction over PCI limit"
+    when
+        the entry mode of the transaction is "NFC_CONTACTLESS"
+        and the transaction amount of the transaction is more than 250
+    then
+        set the decision of the response to "DECLINED" ;
+        set the response code of the response to "61" ;
+        set the decline reason of the response to
+            "Contactless transactions are limited to $250" ;
+end
+
+// ── Default (lowest priority — runs last) ────────────────
+rule "Approve transaction when all checks pass"
+    priority -100
+    when
+        the decision of the response is not "DECLINED"
+    then
+        set the decision of the response to "APPROVED" ;
+        set the response code of the response to "00" ;
+        // IBM RES generates the authorization code
+        set the authorization code of the response
+            to a new 6-character authorization code ;
+end
+`,
+
+'c-odm-response': `\
+// Full JSON response from IBM ODM HTDS endpoint
+// Returned by POST /api/authorize for an APPROVED transaction
+
+{
+  "decision": "APPROVED",
+  "responseCode": "00",              // ISO 8583: Approved
+  "authorizationCode": "B7964F",     // 6-char alphanumeric
+  "declineReason": null,
+  "auditTrail": [
+    {
+      "ruleName": "AmountLimitRule",
+      "fired": false,
+      "result": "PASS",
+      "message": "Amount $4.50 within $10,000 limit"
+    },
+    {
+      "ruleName": "CountryBlacklistRule",
+      "fired": false,
+      "result": "PASS",
+      "message": "Country 'CA' is permitted"
+    },
+    {
+      "ruleName": "MCCRestrictionRule",
+      "fired": false,
+      "result": "PASS",
+      "message": "MCC 5812 is permitted"
+    },
+    {
+      "ruleName": "CardValidityRule",
+      "fired": false,
+      "result": "PASS",
+      "message": "Card passed Luhn validation"
+    },
+    {
+      "ruleName": "ContactlessLimitRule",
+      "fired": false,
+      "result": "PASS",
+      "message": "Contactless limit check passed"
+    }
+  ]
+}
+
+// For a DECLINED transaction (e.g. country = "RU"):
+// {
+//   "decision": "DECLINED",
+//   "responseCode": "05",            // ISO 8583: Do Not Honor
+//   "authorizationCode": null,
+//   "declineReason": "Country 'RU' is OFAC-restricted",
+//   "auditTrail": [
+//     { "ruleName": "AmountLimitRule",      "result": "PASS",    "fired": false },
+//     { "ruleName": "CountryBlacklistRule", "result": "DECLINED","fired": true  }
+//     // ← short-circuit: rules 3-5 not in audit trail
+//   ]
+// }
+`
+
+  }; // end blocks
+
+  // Insert code and highlight
+  Object.entries(blocks).forEach(([id, code]) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.textContent = code.trim();
+      hljs.highlightElement(el);
+    }
+  });
+}
+
+/* ══════════════════════════════════════════════════════════
+   DASHBOARD — existing logic
+══════════════════════════════════════════════════════════ */
 const ALL_NODES = [
   "extract_intent","check_completeness","request_clarification",
   "validate_input","format_error","enrich_mcc","call_odm","format_response"
 ];
-const ALL_RULES = ["AmountLimitRule","CountryBlacklistRule","MCCRestrictionRule","CardValidityRule","ContactlessLimitRule"];
-
-const SCENARIOS = [
-  { title:"Coffee Shop Tap", subtitle:"NFC — all 5 rules pass", expectedRule:null,
-    payload:{transactionAmount:4.50,cardNumber:"4532015112830366",merchantId:"java_joe_001",mcc:"5812",country:"CA",entryMode:"NFC_CONTACTLESS"} },
-  { title:"Grocery Store — Chip", subtitle:"Standard chip transaction",expectedRule:null,
-    payload:{transactionAmount:142.87,cardNumber:"5500005555555559",merchantId:"sobeys_toronto",mcc:"5411",country:"CA",entryMode:"CHIP"} },
-  { title:"$15,000 Transfer", subtitle:"Exceeds $10k limit → AmountLimitRule",expectedRule:"AmountLimitRule",
-    payload:{transactionAmount:15000,cardNumber:"4111111111111111",merchantId:"merchant_toronto",mcc:"5999",country:"CA",entryMode:"CHIP"} },
-  { title:"Moscow Hotel", subtitle:"OFAC country RU → CountryBlacklistRule",expectedRule:"CountryBlacklistRule",
-    payload:{transactionAmount:200,cardNumber:"5500005555555559",merchantId:"hotel_moscow",mcc:"7011",country:"RU",entryMode:"CHIP"} },
-  { title:"Online Casino", subtitle:"MCC 7995 gambling → MCCRestrictionRule",expectedRule:"MCCRestrictionRule",
-    payload:{transactionAmount:100,cardNumber:"4111111111111111",merchantId:"online_casino",mcc:"7995",country:"CA",entryMode:"MANUAL"} },
-  { title:"Invalid Card Number", subtitle:"Fails Luhn → CardValidityRule",expectedRule:"CardValidityRule",
-    payload:{transactionAmount:50,cardNumber:"1234567890123456",merchantId:"shop_001",mcc:"5311",country:"CA",entryMode:"CHIP"} },
-  { title:"$350 Contactless Tap", subtitle:"NFC > $250 PCI limit → ContactlessLimitRule",expectedRule:"ContactlessLimitRule",
-    payload:{transactionAmount:350,cardNumber:"4532015112830366",merchantId:"best_buy_001",mcc:"5732",country:"CA",entryMode:"NFC_CONTACTLESS"} },
-  { title:"No MCC Supplied", subtitle:"enrich_mcc infers code from merchant name",expectedRule:null,
-    payload:{transactionAmount:12.99,cardNumber:"5500005555555559",merchantId:"sobeys_grocery_store",mcc:null,country:"CA",entryMode:"CHIP"} },
+const ALL_RULES = [
+  "AmountLimitRule","CountryBlacklistRule","MCCRestrictionRule",
+  "CardValidityRule","ContactlessLimitRule"
 ];
+const SCENARIOS = [
+  { title:"Coffee Shop Tap",     subtitle:"NFC — all 5 rules pass",              expectedRule:null,
+    payload:{transactionAmount:4.50,   cardNumber:"4532015112830366",merchantId:"java_joe_001",      mcc:"5812",country:"CA",entryMode:"NFC_CONTACTLESS"} },
+  { title:"Grocery Store — Chip",subtitle:"Standard chip transaction",           expectedRule:null,
+    payload:{transactionAmount:142.87, cardNumber:"5500005555555559",merchantId:"sobeys_toronto",    mcc:"5411",country:"CA",entryMode:"CHIP"} },
+  { title:"$15,000 Transfer",    subtitle:"Exceeds $10k → AmountLimitRule",      expectedRule:"AmountLimitRule",
+    payload:{transactionAmount:15000,  cardNumber:"4111111111111111",merchantId:"merchant_toronto",  mcc:"5999",country:"CA",entryMode:"CHIP"} },
+  { title:"Moscow Hotel",        subtitle:"OFAC country RU → CountryBlacklist",  expectedRule:"CountryBlacklistRule",
+    payload:{transactionAmount:200,    cardNumber:"5500005555555559",merchantId:"hotel_moscow",      mcc:"7011",country:"RU",entryMode:"CHIP"} },
+  { title:"Online Casino",       subtitle:"MCC 7995 → MCCRestrictionRule",       expectedRule:"MCCRestrictionRule",
+    payload:{transactionAmount:100,    cardNumber:"4111111111111111",merchantId:"online_casino",     mcc:"7995",country:"CA",entryMode:"MANUAL"} },
+  { title:"Invalid Card Number", subtitle:"Fails Luhn → CardValidityRule",       expectedRule:"CardValidityRule",
+    payload:{transactionAmount:50,     cardNumber:"1234567890123456",merchantId:"shop_001",          mcc:"5311",country:"CA",entryMode:"CHIP"} },
+  { title:"$350 Contactless Tap",subtitle:"NFC > $250 PCI → ContactlessLimit",   expectedRule:"ContactlessLimitRule",
+    payload:{transactionAmount:350,    cardNumber:"4532015112830366",merchantId:"best_buy_001",      mcc:"5732",country:"CA",entryMode:"NFC_CONTACTLESS"} },
+  { title:"No MCC Supplied",     subtitle:"enrich_mcc infers code from merchant",expectedRule:null,
+    payload:{transactionAmount:12.99,  cardNumber:"5500005555555559",merchantId:"sobeys_grocery_store",mcc:null,country:"CA",entryMode:"CHIP"} },
+];
+let stats={total:0,approved:0,declined:0};
 
-let stats = {total:0, approved:0, declined:0};
-
-// ── Render scenario cards ──────────────────────────────────────────────────
-function renderCards() {
-  document.getElementById('scenarios-grid').innerHTML = SCENARIOS.map((s,i) => `
+function renderCards(){
+  document.getElementById('scenarios-grid').innerHTML=SCENARIOS.map((s,i)=>`
     <div class="card" id="card-${i}">
       <div class="card-header">
         <div><div class="title">${s.title}</div><div class="subtitle">${s.subtitle}</div></div>
-        ${s.expectedRule ? `<span class="badge rule">${s.expectedRule}</span>` : ''}
+        ${s.expectedRule?`<span class="badge">${s.expectedRule}</span>`:''}
       </div>
       <div class="card-params">
         <div class="param">$ <span>${s.payload.transactionAmount.toFixed(2)}</span></div>
@@ -364,131 +1254,24 @@ function renderCards() {
     </div>`).join('');
 }
 
-// ── LangGraph node animation ───────────────────────────────────────────────
-function resetGraph() {
-  ALL_NODES.forEach(n => {
-    const el = document.getElementById(`lgn-${n}`);
-    if (el) { el.className = 'lg-node'; el.querySelector('.n-icon').textContent = ALL_NODES.indexOf(n)+1||''; }
-  });
-  for (let i=0; i<=7; i++) {
-    const e = document.getElementById(`lge-${i}`);
-    if (e) e.className = 'lg-edge';
-  }
-  document.getElementById('path-summary').classList.remove('visible');
-}
-
-async function animateGraph(trace, isError) {
-  resetGraph();
-  const edgeNodes = ["extract_intent","check_completeness","validate_input","enrich_mcc","call_odm","format_response"];
-  const symbols = {pass:'✓', fired:'✗', skip:'-'};
-  const terminalOk  = ['format_response'];
-  const terminalErr = ['request_clarification','format_error'];
-
-  for (let i = 0; i < trace.length; i++) {
-    const name = trace[i];
-    const el = document.getElementById(`lgn-${name}`);
-    if (!el) continue;
-
-    // Mark previous node as done
-    if (i > 0) {
-      const prev = document.getElementById(`lgn-${trace[i-1]}`);
-      if (prev) {
-        const isErrNode = terminalErr.includes(trace[i-1]);
-        prev.className = 'lg-node ' + (isErrNode ? 'done-err' : 'done-ok');
-        prev.querySelector('.n-icon').textContent = isErrNode ? '✗' : '✓';
-      }
-    }
-
-    // Animate connecting edge
-    const edgeIdx = edgeNodes.indexOf(name);
-    if (edgeIdx >= 0) {
-      const edgeEl = document.getElementById(`lge-${edgeIdx}`);
-      if (edgeEl) { edgeEl.className = 'lg-edge active'; await sleep(80); }
-    }
-
-    // Activate current node
-    el.className = 'lg-node active';
-    el.querySelector('.n-icon').textContent = '⋯';
-    await sleep(160);
-  }
-
-  // Final node state
-  if (trace.length > 0) {
-    const last = trace[trace.length-1];
-    const lastEl = document.getElementById(`lgn-${last}`);
-    if (lastEl) {
-      const isErrNode = terminalErr.includes(last) || isError;
-      lastEl.className = 'lg-node ' + (isErrNode ? 'done-err' : 'done-ok');
-      lastEl.querySelector('.n-icon').textContent = isErrNode ? '✗' : '✓';
-    }
-  }
-
-  // Skip unvisited
-  ALL_NODES.forEach(n => {
-    if (!trace.includes(n)) {
-      const el = document.getElementById(`lgn-${n}`);
-      if (el) el.classList.add('skipped');
-    }
-  });
-
-  // Mark END
-  const endEl = document.getElementById('lgn-END');
-  if (endEl) {
-    const lastEdge = document.getElementById('lge-7');
-    if (lastEdge && trace.includes('format_response')) lastEdge.className = 'lg-edge done';
-    endEl.style.borderColor = isError ? 'var(--declined)' : 'var(--approved)';
-    endEl.style.opacity = '1';
-  }
-}
-
-function showPathSummary(trace, path, isApproved) {
-  const el = document.getElementById('path-summary');
-  const pathText = document.getElementById('path-text');
-  const nodesEl = document.getElementById('path-nodes');
-  const terminalErr = ['request_clarification','format_error'];
-
-  const label = path === 'happy_path'
-    ? (isApproved ? 'Happy path — APPROVED' : 'Happy path — DECLINED by ODM')
-    : path === 'validation_error' ? 'Validation error path'
-    : 'Clarification required path';
-  pathText.textContent = label;
-
-  nodesEl.innerHTML = trace.map((n,i) => {
-    const isLast = i === trace.length-1;
-    const cls = isLast
-      ? (terminalErr.includes(n) ? 'path-node terminal-err' : 'path-node terminal-ok')
-      : 'path-node visited';
-    return `<span class="${cls}">${n}</span>${i < trace.length-1 ? '<span style="color:var(--muted);font-size:.7rem">→</span>' : ''}`;
-  }).join('');
-
-  el.classList.add('visible');
-}
-
-function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
-
-// ── Audit trail HTML ───────────────────────────────────────────────────────
-function buildAuditTrail(auditTrail) {
-  return ALL_RULES.map(ruleName => {
-    const trace = auditTrail.find(t => t.ruleName === ruleName);
-    if (!trace) return `<div class="rule-row"><div class="rule-icon skipped">-</div><div class="rule-name" style="color:var(--muted)">${ruleName}</div><div class="rule-msg">skipped</div></div>`;
-    const icon = trace.result === 'PASS' ? 'pass' : 'fired';
-    const sym  = trace.result === 'PASS' ? '✓' : '✗';
-    return `<div class="rule-row"><div class="rule-icon ${icon}">${sym}</div><div class="rule-name">${ruleName}</div><div class="rule-msg">${trace.message}</div></div>`;
+function buildAuditTrail(trail){
+  return ALL_RULES.map(rule=>{
+    const t=trail.find(x=>x.ruleName===rule);
+    if(!t) return `<div class="rule-row"><div class="rule-icon skipped">-</div><div class="rule-name" style="color:var(--muted)">${rule}</div><div class="rule-msg">skipped</div></div>`;
+    const cls=t.result==='PASS'?'pass':'fired', sym=t.result==='PASS'?'✓':'✗';
+    return `<div class="rule-row"><div class="rule-icon ${cls}">${sym}</div><div class="rule-name">${rule}</div><div class="rule-msg">${t.message}</div></div>`;
   }).join('');
 }
 
-// ── Render result panel ────────────────────────────────────────────────────
-function renderResult(container, data) {
-  const odm = data.odm_response || {};
-  const isApproved = odm.decision === 'APPROVED';
-  const detail = isApproved
-    ? `<span class="auth-code">Auth: ${odm.authorizationCode}</span>`
-    : `<span class="decline-reason">${odm.declineReason || data.final_answer}</span>`;
-
-  const enriched = data.extracted && data.extracted.mcc && !SCENARIOS.find(s=>s.payload.mcc === data.extracted.mcc)
-    ? `<div style="font-size:.7rem;color:var(--warning);margin-bottom:6px;">MCC enriched → ${data.extracted.mcc}</div>` : '';
-
-  container.innerHTML = `
+function renderResult(container, data){
+  const odm=data.odm_response||{};
+  const ok=odm.decision==='APPROVED';
+  const detail=ok
+    ?`<span class="auth-code">Auth: ${odm.authorizationCode}</span>`
+    :`<span class="decline-reason">${odm.declineReason||data.final_answer||''}</span>`;
+  const enriched = data.extracted&&data.extracted.mcc&&!data.payload_had_mcc
+    ?`<div style="font-size:.68rem;color:var(--warning);margin-bottom:5px;">MCC enriched → ${data.extracted.mcc}</div>`:'';
+  container.innerHTML=`
     ${enriched}
     <div class="decision-row">
       <span class="decision-badge ${odm.decision||'DECLINED'}">${odm.decision||'ERROR'}</span>
@@ -496,101 +1279,130 @@ function renderResult(container, data) {
       ${detail}
     </div>
     <div class="audit-label">IBM ODM Audit Trail</div>
-    <div class="audit-trail">${buildAuditTrail(odm.auditTrail||[])}</div>
-  `;
+    <div class="audit-trail">${buildAuditTrail(odm.auditTrail||[])}</div>`;
   container.classList.add('visible');
 }
 
-// ── Authorize preset scenario ──────────────────────────────────────────────
-async function authorize(i) {
-  const btn = document.getElementById(`btn-${i}`);
-  const resultDiv = document.getElementById(`result-${i}`);
-  const card = document.getElementById(`card-${i}`);
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span>Running workflow…';
-
-  try {
-    const res = await fetch('/api/workflow', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify(SCENARIOS[i].payload)
-    });
-    const data = await res.json();
-    const odm = data.odm_response || {};
-    const isApproved = odm.decision === 'APPROVED';
-    const isError = ['format_error','request_clarification'].includes((data.step_trace||[]).slice(-1)[0]);
-
-    await animateGraph(data.step_trace || [], isError);
-    showPathSummary(data.step_trace || [], data.path, isApproved);
-    renderResult(resultDiv, data);
-
-    card.className = 'card ' + (isApproved ? 'approved' : 'declined');
-    updateStats(odm.decision || 'DECLINED');
-    btn.innerHTML = 'Run Again';
-  } catch(e) {
-    resultDiv.innerHTML = `<div style="color:var(--declined);font-size:.78rem">Error: ${e.message}</div>`;
-    resultDiv.classList.add('visible');
-    btn.innerHTML = 'Retry';
+// LangGraph animation
+function resetGraph(){
+  ALL_NODES.forEach(n=>{
+    const el=document.getElementById('lgn-'+n);
+    if(el){el.className='lg-node';el.querySelector('.n-icon').textContent=ALL_NODES.indexOf(n)+1;}
+  });
+  for(let i=0;i<=7;i++){const e=document.getElementById('lge-'+i);if(e)e.className='lg-edge';}
+  document.getElementById('path-summary').classList.remove('visible');
+}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
+async function animateGraph(trace,isErr){
+  resetGraph();
+  const edgeMap={"extract_intent":0,"check_completeness":1,"validate_input":2,"enrich_mcc":4,"call_odm":5,"format_response":6};
+  const errTerminals=['request_clarification','format_error'];
+  for(let i=0;i<trace.length;i++){
+    const name=trace[i];
+    const el=document.getElementById('lgn-'+name);
+    if(!el)continue;
+    if(i>0){
+      const prev=document.getElementById('lgn-'+trace[i-1]);
+      if(prev){const e=errTerminals.includes(trace[i-1]);prev.className='lg-node '+(e?'done-err':'done-ok');prev.querySelector('.n-icon').textContent=e?'✗':'✓';}
+    }
+    const ei=edgeMap[name];
+    if(ei!==undefined){const ee=document.getElementById('lge-'+ei);if(ee){ee.className='lg-edge active';await sleep(70);}}
+    el.className='lg-node active';el.querySelector('.n-icon').textContent='⋯';
+    await sleep(150);
   }
-  btn.disabled = false;
+  if(trace.length){
+    const last=trace[trace.length-1];
+    const le=document.getElementById('lgn-'+last);
+    if(le){const e=errTerminals.includes(last)||isErr;le.className='lg-node '+(e?'done-err':'done-ok');le.querySelector('.n-icon').textContent=e?'✗':'✓';}
+  }
+  ALL_NODES.forEach(n=>{if(!trace.includes(n)){const el=document.getElementById('lgn-'+n);if(el)el.classList.add('skipped');}});
+  if(trace.includes('format_response')){const e=document.getElementById('lge-7');if(e)e.className='lg-edge done';}
+  const end=document.getElementById('lgn-END');
+  if(end)end.style.borderColor=isErr?'var(--declined)':'var(--approved)';
+}
+function showPathSummary(trace,path,ok){
+  const el=document.getElementById('path-summary');
+  const errTerminals=['request_clarification','format_error'];
+  document.getElementById('path-text').textContent=
+    path==='happy_path'?(ok?'Happy path — APPROVED':'Happy path — DECLINED by ODM'):
+    path==='validation_error'?'Validation error — short-circuited':'Clarification required';
+  document.getElementById('path-nodes').innerHTML=trace.map((n,i)=>{
+    const isLast=i===trace.length-1;
+    const cls=isLast?(errTerminals.includes(n)?'path-node terminal-err':'path-node terminal-ok'):'path-node visited';
+    return `<span class="${cls}">${n}</span>${i<trace.length-1?'<span style="color:var(--muted);font-size:.65rem">→</span>':''}`;
+  }).join('');
+  el.classList.add('visible');
 }
 
-// ── Custom transaction ─────────────────────────────────────────────────────
-async function runCustom() {
-  const btn = document.getElementById('btn-custom');
-  const resultDiv = document.getElementById('custom-result');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span>Running…';
+async function authorize(i){
+  const btn=document.getElementById('btn-'+i);
+  const res=document.getElementById('result-'+i);
+  const card=document.getElementById('card-'+i);
+  btn.disabled=true;btn.innerHTML='<span class="spinner"></span>Running…';
+  try{
+    const r=await fetch('/api/workflow',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(SCENARIOS[i].payload)});
+    const data=await r.json();
+    const odm=data.odm_response||{};
+    const ok=odm.decision==='APPROVED';
+    const isErr=['format_error','request_clarification'].includes((data.step_trace||[]).slice(-1)[0]);
+    await animateGraph(data.step_trace||[],isErr);
+    showPathSummary(data.step_trace||[],data.path,ok);
+    renderResult(res,data);
+    card.className='card '+(ok?'approved':'declined');
+    updateStats(odm.decision||'DECLINED');
+    btn.innerHTML='Run Again';
+  }catch(e){
+    res.innerHTML=`<div style="color:var(--declined);font-size:.76rem">Error: ${e.message}</div>`;
+    res.classList.add('visible');btn.innerHTML='Retry';
+  }
+  btn.disabled=false;
+}
 
-  const payload = {
-    transactionAmount: parseFloat(document.getElementById('f-amount').value),
-    cardNumber: document.getElementById('f-card').value.trim(),
-    merchantId: document.getElementById('f-merchant').value.trim(),
-    mcc: document.getElementById('f-mcc').value.trim() || null,
-    country: document.getElementById('f-country').value.trim().toUpperCase(),
-    entryMode: document.getElementById('f-entry').value,
+async function runCustom(){
+  const btn=document.getElementById('btn-custom');
+  const res=document.getElementById('custom-result');
+  btn.disabled=true;btn.innerHTML='<span class="spinner"></span>Running…';
+  const payload={
+    transactionAmount:parseFloat(document.getElementById('f-amount').value),
+    cardNumber:document.getElementById('f-card').value.trim(),
+    merchantId:document.getElementById('f-merchant').value.trim(),
+    mcc:document.getElementById('f-mcc').value.trim()||null,
+    country:document.getElementById('f-country').value.trim().toUpperCase(),
+    entryMode:document.getElementById('f-entry').value,
   };
-
-  try {
-    const res = await fetch('/api/workflow', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify(payload)
-    });
-    const data = await res.json();
-    const odm = data.odm_response || {};
-    const isApproved = odm.decision === 'APPROVED';
-    const isError = ['format_error','request_clarification'].includes((data.step_trace||[]).slice(-1)[0]);
-
-    await animateGraph(data.step_trace || [], isError);
-    showPathSummary(data.step_trace || [], data.path, isApproved);
-    renderResult(resultDiv, data);
-    updateStats(odm.decision || 'DECLINED');
-  } catch(e) {
-    resultDiv.innerHTML = `<div style="color:var(--declined);font-size:.78rem">Error: ${e.message}</div>`;
-    resultDiv.classList.add('visible');
+  try{
+    const r=await fetch('/api/workflow',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const data=await r.json();
+    const odm=data.odm_response||{};
+    const ok=odm.decision==='APPROVED';
+    const isErr=['format_error','request_clarification'].includes((data.step_trace||[]).slice(-1)[0]);
+    await animateGraph(data.step_trace||[],isErr);
+    showPathSummary(data.step_trace||[],data.path,ok);
+    renderResult(res,data);
+    updateStats(odm.decision||'DECLINED');
+  }catch(e){
+    res.innerHTML=`<div style="color:var(--declined);font-size:.76rem">Error: ${e.message}</div>`;
+    res.classList.add('visible');
   }
-  btn.disabled = false;
-  btn.innerHTML = 'Authorize Now';
+  btn.disabled=false;btn.innerHTML='Authorize Now';
 }
 
-// ── Stats ──────────────────────────────────────────────────────────────────
-function updateStats(decision) {
-  stats.total++;
-  if (decision === 'APPROVED') stats.approved++; else stats.declined++;
-  document.getElementById('stat-total').textContent    = stats.total;
-  document.getElementById('stat-approved').textContent = stats.approved;
-  document.getElementById('stat-declined').textContent = stats.declined;
+function updateStats(decision){
+  stats.total++;if(decision==='APPROVED')stats.approved++;else stats.declined++;
+  document.getElementById('stat-total').textContent=stats.total;
+  document.getElementById('stat-approved').textContent=stats.approved;
+  document.getElementById('stat-declined').textContent=stats.declined;
 }
 
-// ── Health check ───────────────────────────────────────────────────────────
-async function checkHealth() {
-  try {
-    const d = await (await fetch('/health')).json();
-    document.getElementById('status-dot').style.background = 'var(--approved)';
-    document.getElementById('status-text').textContent = d.engine;
-  } catch {
-    document.getElementById('status-dot').style.background = 'var(--declined)';
-    document.getElementById('status-dot').style.animation = 'none';
-    document.getElementById('status-text').textContent = 'Server unreachable';
+async function checkHealth(){
+  try{
+    const d=await(await fetch('/health')).json();
+    document.getElementById('status-dot').style.background='var(--approved)';
+    document.getElementById('status-text').textContent=d.engine;
+  }catch{
+    document.getElementById('status-dot').style.background='var(--declined)';
+    document.getElementById('status-dot').style.animation='none';
+    document.getElementById('status-text').textContent='Server unreachable';
   }
 }
 
