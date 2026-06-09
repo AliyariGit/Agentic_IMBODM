@@ -185,6 +185,55 @@ def health():
     return {"status": "ok", "engine": "IBM ODM Mock RES v1.0"}
 
 
+# ---------------------------------------------------------------------------
+# LangGraph workflow endpoint — runs the full graph (minus LLM extraction)
+# and returns the step_trace alongside the ODM result
+# ---------------------------------------------------------------------------
+
+class WorkflowResponse(BaseModel):
+    step_trace:   list[str]
+    path:         str                   # happy_path | clarification | validation_error
+    final_answer: str
+    odm_response: Optional[dict]
+    extracted:    dict
+
+@app.post("/api/workflow", response_model=WorkflowResponse)
+def workflow(req: TransactionRequest) -> WorkflowResponse:
+    """
+    Runs the LangGraph ruleflow starting from validate_input.
+    The LLM extraction step is bypassed — structured fields come from the request body.
+    Returns the execution step_trace so the UI can highlight each visited node.
+    """
+    from langgraph_workflow import run_workflow_from_fields
+
+    fields = {
+        "amount":      req.transactionAmount,
+        "card_number": req.cardNumber,
+        "merchant_id": req.merchantId,
+        "mcc":         req.mcc or None,
+        "country":     req.country,
+        "entry_mode":  req.entryMode or "CHIP",
+    }
+
+    result = run_workflow_from_fields(fields)
+
+    trace = result["step_trace"]
+    if "format_error" in trace:
+        path = "validation_error"
+    elif "request_clarification" in trace:
+        path = "clarification"
+    else:
+        path = "happy_path"
+
+    return WorkflowResponse(
+        step_trace=trace,
+        path=path,
+        final_answer=result["final_answer"],
+        odm_response=result.get("odm_response"),
+        extracted=result.get("extracted", {}),
+    )
+
+
 _BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 @app.get("/")

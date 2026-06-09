@@ -6,396 +6,158 @@
 <title>Agentic AI + IBM ODM — Payment Authorization Demo</title>
 <style>
   :root {
-    --bg: #0d1117;
-    --surface: #161b22;
-    --surface2: #21262d;
-    --border: #30363d;
-    --text: #e6edf3;
-    --muted: #8b949e;
-    --approved: #3fb950;
-    --approved-bg: #0d2a14;
-    --declined: #f85149;
-    --declined-bg: #2a0d0d;
-    --accent: #58a6ff;
-    --accent-bg: #0d1f3c;
-    --warning: #d29922;
-    --pass: #238636;
-    --pass-bg: #0d2a14;
+    --bg:#0d1117; --surface:#161b22; --surface2:#21262d; --border:#30363d;
+    --text:#e6edf3; --muted:#8b949e;
+    --approved:#3fb950; --approved-bg:#0d2a14;
+    --declined:#f85149; --declined-bg:#2a0d0d;
+    --accent:#58a6ff; --accent-bg:#0d1f3c;
+    --warning:#d29922; --pass:#238636;
+    --node-idle:#21262d; --node-active:#1f6feb; --node-done-ok:#238636; --node-done-err:#b91c1c;
   }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    padding-bottom: 60px;
-  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:80px;}
 
   /* ── Header ── */
-  header {
-    background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
-    border-bottom: 1px solid var(--border);
-    padding: 20px 32px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    backdrop-filter: blur(8px);
-  }
-  header h1 {
-    font-size: 1.15rem;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  header h1 .logo {
-    width: 28px; height: 28px;
-    background: linear-gradient(135deg, #1f6feb, #388bfd);
-    border-radius: 6px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 14px; font-weight: 700; color: white;
-  }
-  .status-pill {
-    display: flex; align-items: center; gap: 8px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 6px 14px;
-    font-size: 0.78rem;
-    color: var(--muted);
-  }
-  .status-pill .dot {
-    width: 8px; height: 8px; border-radius: 50%;
-    background: var(--approved);
-    animation: pulse 2s ease-in-out infinite;
-  }
-  @keyframes pulse {
-    0%,100% { opacity:1; } 50% { opacity:.4; }
-  }
+  header{background:linear-gradient(135deg,#0d1117,#161b22);border-bottom:1px solid var(--border);padding:18px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;backdrop-filter:blur(8px);}
+  header h1{font-size:1.1rem;font-weight:600;display:flex;align-items:center;gap:10px;}
+  .logo{width:28px;height:28px;background:linear-gradient(135deg,#1f6feb,#388bfd);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;}
+  .status-pill{display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:.78rem;color:var(--muted);}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--approved);animation:pulse 2s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
 
   /* ── Layout ── */
-  main { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
+  main{max-width:1260px;margin:0 auto;padding:28px 20px;}
 
-  /* ── Architecture banner ── */
-  .arch-banner {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 20px 28px;
-    margin-bottom: 32px;
-    overflow-x: auto;
+  /* ── Arch banner ── */
+  .arch-banner{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 24px;margin-bottom:24px;overflow-x:auto;}
+  .arch-banner h2{font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;}
+  .arch-flow{display:flex;align-items:center;gap:0;white-space:nowrap;}
+  .arch-box{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 14px;font-size:.78rem;text-align:center;min-width:110px;}
+  .arch-box .label{font-weight:600;}
+  .arch-box .sub{font-size:.66rem;color:var(--muted);margin-top:2px;}
+  .arch-box.hi{border-color:var(--accent);background:var(--accent-bg);}
+  .arch-box.hi .label{color:var(--accent);}
+  .arch-arrow{color:var(--muted);font-size:1rem;padding:0 5px;}
+
+  /* ── Stats ── */
+  .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;}
+  .stat-box{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 18px;text-align:center;}
+  .stat-box .num{font-size:1.7rem;font-weight:700;line-height:1;margin-bottom:3px;}
+  .stat-box .lbl{font-size:.7rem;color:var(--muted);}
+  .stat-box.t .num{color:var(--accent);} .stat-box.a .num{color:var(--approved);} .stat-box.d .num{color:var(--declined);} .stat-box.r .num{color:var(--warning);}
+
+  /* ── Two-column body ── */
+  .body-grid{display:grid;grid-template-columns:1fr 380px;gap:20px;align-items:start;}
+
+  /* ── LangGraph panel ── */
+  .lg-panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;position:sticky;top:76px;}
+  .lg-panel h2{font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:16px;}
+
+  /* Graph nodes */
+  .lg-graph{display:flex;flex-direction:column;align-items:center;gap:0;}
+  .lg-node{
+    width:100%;max-width:280px;
+    background:var(--node-idle);border:1.5px solid var(--border);
+    border-radius:8px;padding:9px 14px;
+    display:flex;align-items:center;gap:10px;
+    font-size:.8rem;transition:all .3s;
   }
-  .arch-banner h2 {
-    font-size: 0.72rem;
-    letter-spacing: .08em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 14px;
-  }
-  .arch-flow {
-    display: flex;
-    align-items: center;
-    gap: 0;
-    white-space: nowrap;
-  }
-  .arch-box {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 10px 16px;
-    font-size: 0.8rem;
-    text-align: center;
-    min-width: 120px;
-  }
-  .arch-box .label { font-weight: 600; color: var(--text); }
-  .arch-box .sub { font-size: 0.68rem; color: var(--muted); margin-top: 2px; }
-  .arch-box.highlight { border-color: var(--accent); background: var(--accent-bg); }
-  .arch-box.highlight .label { color: var(--accent); }
-  .arch-arrow {
-    color: var(--muted);
-    font-size: 1.1rem;
-    padding: 0 6px;
-  }
+  .lg-node .n-icon{width:22px;height:22px;border-radius:50%;background:var(--surface2);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;transition:all .3s;}
+  .lg-node .n-name{font-weight:600;color:var(--text);}
+  .lg-node .n-sub{font-size:.65rem;color:var(--muted);margin-top:1px;}
+
+  /* Active state */
+  .lg-node.active{border-color:var(--node-active);background:#0d1f3c;}
+  .lg-node.active .n-icon{background:var(--node-active);border-color:var(--node-active);color:#fff;}
+  .lg-node.active .n-name{color:var(--accent);}
+
+  /* Done OK */
+  .lg-node.done-ok{border-color:var(--node-done-ok);background:#0d2a14;}
+  .lg-node.done-ok .n-icon{background:var(--node-done-ok);border-color:var(--node-done-ok);color:#fff;}
+  .lg-node.done-ok .n-name{color:var(--approved);}
+
+  /* Done ERR */
+  .lg-node.done-err{border-color:var(--node-done-err);background:#2a0d0d;}
+  .lg-node.done-err .n-icon{background:var(--node-done-err);border-color:var(--node-done-err);color:#fff;}
+  .lg-node.done-err .n-name{color:var(--declined);}
+
+  /* Skipped */
+  .lg-node.skipped{opacity:.35;}
+
+  /* Connector lines */
+  .lg-edge{width:2px;height:16px;background:var(--border);margin:0 auto;transition:background .3s;}
+  .lg-edge.active{background:var(--node-active);}
+  .lg-edge.done{background:var(--node-done-ok);}
+  .lg-edge.err{background:var(--node-done-err);}
+
+  /* Conditional fork labels */
+  .lg-fork{display:flex;align-items:center;gap:6px;margin:4px auto;font-size:.65rem;color:var(--muted);}
+  .lg-fork .tag{background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:1px 6px;}
+
+  /* Path summary */
+  .path-summary{margin-top:14px;padding:10px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;font-size:.75rem;color:var(--muted);display:none;}
+  .path-summary.visible{display:block;}
+  .path-summary .path-label{font-size:.65rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;}
+  .path-nodes{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;}
+  .path-node{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:2px 7px;font-size:.68rem;font-family:monospace;}
+  .path-node.visited{background:var(--accent-bg);border-color:var(--accent);color:var(--accent);}
+  .path-node.terminal-ok{background:#0d2a14;border-color:var(--approved);color:var(--approved);}
+  .path-node.terminal-err{background:#2a0d0d;border-color:var(--declined);color:var(--declined);}
 
   /* ── Section title ── */
-  .section-title {
-    font-size: 0.72rem;
-    letter-spacing: .08em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 16px;
-    margin-top: 32px;
-  }
+  .section-title{font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;margin-top:24px;}
 
-  /* ── Scenario grid ── */
-  .scenarios-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-    gap: 16px;
-  }
-
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    overflow: hidden;
-    transition: border-color .2s, transform .15s;
-  }
-  .card:hover { border-color: #58a6ff55; transform: translateY(-1px); }
-  .card.approved { border-color: var(--approved); }
-  .card.declined { border-color: var(--declined); }
-
-  .card-header {
-    padding: 16px 20px 12px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 10px;
-  }
-  .card-header .title { font-size: 0.92rem; font-weight: 600; }
-  .card-header .subtitle { font-size: 0.75rem; color: var(--muted); margin-top: 3px; }
-  .badge {
-    font-size: 0.68rem;
-    font-weight: 600;
-    padding: 3px 8px;
-    border-radius: 4px;
-    white-space: nowrap;
-  }
-  .badge.rule { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
-
-  .card-params {
-    padding: 12px 20px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-  .param {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 4px 10px;
-    font-size: 0.75rem;
-    font-family: "SFMono-Regular", Consolas, monospace;
-    color: var(--muted);
-  }
-  .param span { color: var(--text); font-weight: 500; }
-
-  .card-action {
-    padding: 0 20px 16px;
-  }
-  .btn-authorize {
-    width: 100%;
-    padding: 10px 0;
-    background: linear-gradient(135deg, #1f6feb, #388bfd);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: opacity .2s, transform .1s;
-  }
-  .btn-authorize:hover { opacity: .9; }
-  .btn-authorize:active { transform: scale(.98); }
-  .btn-authorize:disabled { opacity: .5; cursor: not-allowed; }
-
-  /* ── Result panel inside card ── */
-  .card-result {
-    display: none;
-    padding: 16px 20px;
-    border-top: 1px solid var(--border);
-    animation: fadeIn .3s ease;
-  }
-  @keyframes fadeIn { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:none; } }
-  .card-result.visible { display: block; }
-
-  .decision-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 12px;
-  }
-  .decision-badge {
-    font-size: 0.9rem;
-    font-weight: 700;
-    padding: 5px 14px;
-    border-radius: 6px;
-    letter-spacing: .04em;
-  }
-  .decision-badge.APPROVED { background: var(--approved-bg); color: var(--approved); border: 1px solid var(--approved); }
-  .decision-badge.DECLINED { background: var(--declined-bg); color: var(--declined); border: 1px solid var(--declined); }
-
-  .auth-code {
-    font-family: "SFMono-Regular", Consolas, monospace;
-    font-size: 0.85rem;
-    color: var(--approved);
-    background: var(--approved-bg);
-    padding: 4px 10px;
-    border-radius: 5px;
-    border: 1px solid #238636;
-  }
-  .decline-reason {
-    font-size: 0.8rem;
-    color: var(--declined);
-    background: var(--declined-bg);
-    padding: 4px 10px;
-    border-radius: 5px;
-    border: 1px solid #6e1a18;
-  }
-
-  /* ── Audit trail ── */
-  .audit-label {
-    font-size: 0.68rem;
-    text-transform: uppercase;
-    letter-spacing: .07em;
-    color: var(--muted);
-    margin-bottom: 8px;
-  }
-  .audit-trail {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-  }
-  .rule-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.78rem;
-  }
-  .rule-icon {
-    width: 18px; height: 18px;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 10px;
-    font-weight: 700;
-    flex-shrink: 0;
-  }
-  .rule-icon.pass { background: var(--pass); color: white; }
-  .rule-icon.fired { background: var(--declined); color: white; }
-  .rule-icon.skipped { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
-  .rule-name { color: var(--text); }
-  .rule-msg { color: var(--muted); font-size: 0.72rem; margin-left: auto; text-align: right; max-width: 55%; }
-  .rc-badge {
-    font-family: monospace;
-    font-size: 0.7rem;
-    padding: 2px 7px;
-    border-radius: 4px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    color: var(--muted);
-    margin-left: 6px;
-  }
+  /* ── Scenario cards ── */
+  .scenarios-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px;}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:border-color .2s,transform .15s;}
+  .card:hover{border-color:#58a6ff44;transform:translateY(-1px);}
+  .card.approved{border-color:var(--approved);} .card.declined{border-color:var(--declined);}
+  .card-header{padding:14px 18px 10px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
+  .card-header .title{font-size:.9rem;font-weight:600;}
+  .card-header .subtitle{font-size:.73rem;color:var(--muted);margin-top:2px;}
+  .badge{font-size:.65rem;font-weight:600;padding:3px 8px;border-radius:4px;white-space:nowrap;}
+  .badge.rule{background:var(--surface2);color:var(--muted);border:1px solid var(--border);}
+  .card-params{padding:10px 18px;display:flex;flex-wrap:wrap;gap:7px;}
+  .param{background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:3px 9px;font-size:.73rem;font-family:"SFMono-Regular",Consolas,monospace;color:var(--muted);}
+  .param span{color:var(--text);font-weight:500;}
+  .card-action{padding:0 18px 14px;}
+  .btn-authorize{width:100%;padding:9px 0;background:linear-gradient(135deg,#1f6feb,#388bfd);color:#fff;border:none;border-radius:7px;font-size:.83rem;font-weight:600;cursor:pointer;transition:opacity .2s,transform .1s;}
+  .btn-authorize:hover{opacity:.9;} .btn-authorize:active{transform:scale(.98);} .btn-authorize:disabled{opacity:.5;cursor:not-allowed;}
+  .card-result{display:none;padding:14px 18px;border-top:1px solid var(--border);animation:fadeIn .3s ease;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+  .card-result.visible{display:block;}
+  .decision-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
+  .decision-badge{font-size:.88rem;font-weight:700;padding:4px 12px;border-radius:5px;letter-spacing:.04em;}
+  .decision-badge.APPROVED{background:var(--approved-bg);color:var(--approved);border:1px solid var(--approved);}
+  .decision-badge.DECLINED{background:var(--declined-bg);color:var(--declined);border:1px solid var(--declined);}
+  .auth-code{font-family:monospace;font-size:.82rem;color:var(--approved);background:var(--approved-bg);padding:3px 9px;border-radius:4px;border:1px solid #238636;}
+  .decline-reason{font-size:.78rem;color:var(--declined);background:var(--declined-bg);padding:3px 9px;border-radius:4px;border:1px solid #6e1a18;}
+  .rc-badge{font-family:monospace;font-size:.68rem;padding:2px 6px;border-radius:4px;background:var(--surface2);border:1px solid var(--border);color:var(--muted);}
+  .audit-label{font-size:.65rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:7px;}
+  .audit-trail{display:flex;flex-direction:column;gap:4px;}
+  .rule-row{display:flex;align-items:center;gap:7px;font-size:.76rem;}
+  .rule-icon{width:17px;height:17px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0;}
+  .rule-icon.pass{background:var(--pass);color:#fff;} .rule-icon.fired{background:var(--declined);color:#fff;} .rule-icon.skipped{background:var(--surface2);color:var(--muted);border:1px solid var(--border);}
+  .rule-name{color:var(--text);}
+  .rule-msg{color:var(--muted);font-size:.7rem;margin-left:auto;text-align:right;max-width:50%;}
 
   /* ── Custom form ── */
-  .custom-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 24px 28px;
-    margin-top: 32px;
-  }
-  .custom-card h3 {
-    font-size: 0.95rem;
-    font-weight: 600;
-    margin-bottom: 4px;
-  }
-  .custom-card .desc {
-    font-size: 0.78rem;
-    color: var(--muted);
-    margin-bottom: 20px;
-  }
-  .form-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 14px;
-    margin-bottom: 18px;
-  }
-  .form-field label {
-    display: block;
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    letter-spacing: .06em;
-    color: var(--muted);
-    margin-bottom: 6px;
-  }
-  .form-field input, .form-field select {
-    width: 100%;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 7px;
-    padding: 8px 12px;
-    color: var(--text);
-    font-size: 0.85rem;
-    font-family: inherit;
-    outline: none;
-    transition: border-color .15s;
-  }
-  .form-field input:focus, .form-field select:focus { border-color: var(--accent); }
-  .form-field select option { background: var(--surface2); }
-
-  .btn-custom {
-    padding: 10px 28px;
-    background: linear-gradient(135deg, #1f6feb, #388bfd);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 0.88rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: opacity .2s;
-  }
-  .btn-custom:hover { opacity: .9; }
-  .btn-custom:disabled { opacity: .5; cursor: not-allowed; }
-
-  #custom-result {
-    margin-top: 20px;
-    display: none;
-    animation: fadeIn .3s ease;
-  }
-  #custom-result.visible { display: block; }
+  .custom-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:22px 26px;margin-top:24px;}
+  .custom-card h3{font-size:.92rem;font-weight:600;margin-bottom:3px;}
+  .custom-card .desc{font-size:.76rem;color:var(--muted);margin-bottom:18px;}
+  .form-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:12px;margin-bottom:16px;}
+  .form-field label{display:block;font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:5px;}
+  .form-field input,.form-field select{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:7px 11px;color:var(--text);font-size:.83rem;font-family:inherit;outline:none;transition:border-color .15s;}
+  .form-field input:focus,.form-field select:focus{border-color:var(--accent);}
+  .form-field select option{background:var(--surface2);}
+  .btn-custom{padding:9px 26px;background:linear-gradient(135deg,#1f6feb,#388bfd);color:#fff;border:none;border-radius:7px;font-size:.85rem;font-weight:600;cursor:pointer;transition:opacity .2s;}
+  .btn-custom:hover{opacity:.9;} .btn-custom:disabled{opacity:.5;cursor:not-allowed;}
+  #custom-result{margin-top:18px;display:none;animation:fadeIn .3s ease;}
+  #custom-result.visible{display:block;}
 
   /* ── Spinner ── */
-  .spinner {
-    display: inline-block;
-    width: 14px; height: 14px;
-    border: 2px solid rgba(255,255,255,.3);
-    border-top-color: white;
-    border-radius: 50%;
-    animation: spin .6s linear infinite;
-    vertical-align: middle;
-    margin-right: 6px;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* ── Stats row ── */
-  .stats-row {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-    margin-bottom: 32px;
-  }
-  .stat-box {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 16px 20px;
-    text-align: center;
-  }
-  .stat-box .num {
-    font-size: 1.8rem;
-    font-weight: 700;
-    line-height: 1;
-    margin-bottom: 4px;
-  }
-  .stat-box .lbl { font-size: 0.72rem; color: var(--muted); }
-  .stat-box.approved .num { color: var(--approved); }
-  .stat-box.declined .num { color: var(--declined); }
-  .stat-box.total .num { color: var(--accent); }
-  .stat-box.rules .num { color: var(--warning); }
+  .spinner{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:5px;}
+  @keyframes spin{to{transform:rotate(360deg);}}
 </style>
 </head>
 <body>
@@ -407,7 +169,7 @@
   </h1>
   <div class="status-pill">
     <div class="dot" id="status-dot"></div>
-    <span id="status-text">Connecting...</span>
+    <span id="status-text">Connecting…</span>
   </div>
 </header>
 
@@ -417,230 +179,181 @@
   <div class="arch-banner">
     <h2>Architecture</h2>
     <div class="arch-flow">
-      <div class="arch-box">
-        <div class="label">Natural Language</div>
-        <div class="sub">User message</div>
-      </div>
+      <div class="arch-box"><div class="label">Natural Language</div><div class="sub">User message</div></div>
       <div class="arch-arrow">&#8594;</div>
-      <div class="arch-box highlight">
-        <div class="label">LangChain Agent</div>
-        <div class="sub">Azure OpenAI / GPT-4</div>
-      </div>
+      <div class="arch-box hi"><div class="label">LangGraph</div><div class="sub">8-node StateGraph</div></div>
       <div class="arch-arrow">&#8594;</div>
-      <div class="arch-box">
-        <div class="label">Intent Extraction</div>
-        <div class="sub">amount · card · MCC · country</div>
-      </div>
+      <div class="arch-box hi"><div class="label">LangChain Agent</div><div class="sub">Azure OpenAI / GPT-4</div></div>
       <div class="arch-arrow">&#8594;</div>
-      <div class="arch-box highlight">
-        <div class="label">IBM ODM RES</div>
-        <div class="sub">5-rule ruleflow · HTDS</div>
-      </div>
+      <div class="arch-box"><div class="label">Intent Extraction</div><div class="sub">amount · card · MCC · country</div></div>
       <div class="arch-arrow">&#8594;</div>
-      <div class="arch-box">
-        <div class="label">Decision</div>
-        <div class="sub">APPROVED / DECLINED + audit</div>
-      </div>
+      <div class="arch-box hi"><div class="label">IBM ODM RES</div><div class="sub">5-rule ruleflow · HTDS</div></div>
       <div class="arch-arrow">&#8594;</div>
-      <div class="arch-box">
-        <div class="label">Agent Response</div>
-        <div class="sub">Plain-language answer</div>
-      </div>
+      <div class="arch-box"><div class="label">Decision</div><div class="sub">APPROVED / DECLINED + audit</div></div>
+      <div class="arch-arrow">&#8594;</div>
+      <div class="arch-box"><div class="label">Agent Response</div><div class="sub">Plain-language answer</div></div>
     </div>
   </div>
 
   <!-- Stats -->
   <div class="stats-row">
-    <div class="stat-box total">
-      <div class="num" id="stat-total">0</div>
-      <div class="lbl">Transactions Run</div>
-    </div>
-    <div class="stat-box approved">
-      <div class="num" id="stat-approved">0</div>
-      <div class="lbl">Approved</div>
-    </div>
-    <div class="stat-box declined">
-      <div class="num" id="stat-declined">0</div>
-      <div class="lbl">Declined</div>
-    </div>
-    <div class="stat-box rules">
-      <div class="num">5</div>
-      <div class="lbl">Active ODM Rules</div>
-    </div>
+    <div class="stat-box t"><div class="num" id="stat-total">0</div><div class="lbl">Transactions Run</div></div>
+    <div class="stat-box a"><div class="num" id="stat-approved">0</div><div class="lbl">Approved</div></div>
+    <div class="stat-box d"><div class="num" id="stat-declined">0</div><div class="lbl">Declined</div></div>
+    <div class="stat-box r"><div class="num">5</div><div class="lbl">Active ODM Rules</div></div>
   </div>
 
-  <!-- Scenarios -->
-  <div class="section-title">Preset Scenarios — click Authorize to run each through IBM ODM</div>
-  <div class="scenarios-grid" id="scenarios-grid"></div>
+  <!-- Two-column: scenarios + LangGraph panel -->
+  <div class="body-grid">
 
-  <!-- Custom form -->
-  <div class="custom-card">
-    <h3>Custom Transaction</h3>
-    <p class="desc">Build your own payload and send it straight to the ODM rule engine.</p>
-    <div class="form-grid">
-      <div class="form-field">
-        <label>Amount ($)</label>
-        <input type="number" id="f-amount" value="75.00" step="0.01" min="0">
-      </div>
-      <div class="form-field">
-        <label>Card Number</label>
-        <input type="text" id="f-card" value="4532015112830366" maxlength="16">
-      </div>
-      <div class="form-field">
-        <label>Merchant ID</label>
-        <input type="text" id="f-merchant" value="my_merchant_001">
-      </div>
-      <div class="form-field">
-        <label>MCC Code</label>
-        <input type="text" id="f-mcc" value="5812" maxlength="4">
-      </div>
-      <div class="form-field">
-        <label>Country (ISO)</label>
-        <input type="text" id="f-country" value="CA" maxlength="2">
-      </div>
-      <div class="form-field">
-        <label>Entry Mode</label>
-        <select id="f-entry">
-          <option value="CHIP">CHIP</option>
-          <option value="NFC_CONTACTLESS">NFC_CONTACTLESS</option>
-          <option value="SWIPE">SWIPE</option>
-          <option value="MANUAL">MANUAL</option>
-        </select>
+    <!-- Left: scenarios -->
+    <div>
+      <div class="section-title">Preset Scenarios — click Authorize to run each through the LangGraph workflow + IBM ODM</div>
+      <div class="scenarios-grid" id="scenarios-grid"></div>
+
+      <!-- Custom form -->
+      <div class="custom-card">
+        <h3>Custom Transaction</h3>
+        <p class="desc">Build your own payload — runs through the full LangGraph workflow then IBM ODM.</p>
+        <div class="form-grid">
+          <div class="form-field"><label>Amount ($)</label><input type="number" id="f-amount" value="75.00" step="0.01" min="0"></div>
+          <div class="form-field"><label>Card Number</label><input type="text" id="f-card" value="4532015112830366" maxlength="16"></div>
+          <div class="form-field"><label>Merchant ID</label><input type="text" id="f-merchant" value="my_merchant_001"></div>
+          <div class="form-field"><label>MCC Code</label><input type="text" id="f-mcc" value="5812" maxlength="4"></div>
+          <div class="form-field"><label>Country (ISO)</label><input type="text" id="f-country" value="CA" maxlength="2"></div>
+          <div class="form-field"><label>Entry Mode</label>
+            <select id="f-entry">
+              <option value="CHIP">CHIP</option>
+              <option value="NFC_CONTACTLESS">NFC_CONTACTLESS</option>
+              <option value="SWIPE">SWIPE</option>
+              <option value="MANUAL">MANUAL</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn-custom" id="btn-custom" onclick="runCustom()">Authorize Now</button>
+        <div id="custom-result"></div>
       </div>
     </div>
-    <button class="btn-custom" id="btn-custom" onclick="runCustom()">Authorize Now</button>
-    <div id="custom-result"></div>
-  </div>
+
+    <!-- Right: LangGraph panel -->
+    <div class="lg-panel">
+      <h2>LangGraph Workflow — Execution Trace</h2>
+
+      <div class="lg-graph" id="lg-graph">
+
+        <!-- Node: extract_intent -->
+        <div class="lg-node" id="lgn-extract_intent">
+          <div class="n-icon" id="lgi-extract_intent">1</div>
+          <div><div class="n-name">extract_intent</div><div class="n-sub">LLM → structured fields</div></div>
+        </div>
+        <div class="lg-edge" id="lge-0"></div>
+
+        <!-- Node: check_completeness -->
+        <div class="lg-node" id="lgn-check_completeness">
+          <div class="n-icon" id="lgi-check_completeness">2</div>
+          <div><div class="n-name">check_completeness</div><div class="n-sub">router: all fields present?</div></div>
+        </div>
+        <div class="lg-edge" id="lge-1"></div>
+        <div class="lg-fork">
+          <span class="tag" style="color:var(--approved)">complete ↓</span>
+          <span style="flex:1;border-top:1px dashed var(--border);margin:0 4px;"></span>
+          <span class="tag" style="color:var(--declined)">missing → clarification</span>
+        </div>
+        <div class="lg-edge" id="lge-2"></div>
+
+        <!-- Node: validate_input -->
+        <div class="lg-node" id="lgn-validate_input">
+          <div class="n-icon" id="lgi-validate_input">3</div>
+          <div><div class="n-name">validate_input</div><div class="n-sub">amount · card · ISO country</div></div>
+        </div>
+        <div class="lg-edge" id="lge-3"></div>
+        <div class="lg-fork">
+          <span class="tag" style="color:var(--approved)">valid ↓</span>
+          <span style="flex:1;border-top:1px dashed var(--border);margin:0 4px;"></span>
+          <span class="tag" style="color:var(--declined)">errors → format_error</span>
+        </div>
+        <div class="lg-edge" id="lge-4"></div>
+
+        <!-- Node: enrich_mcc -->
+        <div class="lg-node" id="lgn-enrich_mcc">
+          <div class="n-icon" id="lgi-enrich_mcc">4</div>
+          <div><div class="n-name">enrich_mcc</div><div class="n-sub">infer ISO 18245 MCC if absent</div></div>
+        </div>
+        <div class="lg-edge" id="lge-5"></div>
+
+        <!-- Node: call_odm -->
+        <div class="lg-node" id="lgn-call_odm">
+          <div class="n-icon" id="lgi-call_odm">5</div>
+          <div><div class="n-name">call_odm</div><div class="n-sub">POST → IBM ODM HTDS REST</div></div>
+        </div>
+        <div class="lg-edge" id="lge-6"></div>
+
+        <!-- Node: format_response -->
+        <div class="lg-node" id="lgn-format_response">
+          <div class="n-icon" id="lgi-format_response">6</div>
+          <div><div class="n-name">format_response</div><div class="n-sub">ODM JSON → plain language</div></div>
+        </div>
+        <div class="lg-edge" id="lge-7"></div>
+
+        <!-- END -->
+        <div class="lg-node" id="lgn-END" style="justify-content:center;max-width:120px;background:var(--bg);border-style:dashed;">
+          <div class="n-name" style="font-size:.8rem;color:var(--muted)">END</div>
+        </div>
+
+      </div>
+
+      <!-- Path summary -->
+      <div class="path-summary" id="path-summary">
+        <div class="path-label">Execution path</div>
+        <div id="path-text" style="color:var(--text);font-size:.78rem;margin-bottom:6px;"></div>
+        <div class="path-nodes" id="path-nodes"></div>
+      </div>
+
+    </div><!-- /right panel -->
+  </div><!-- /body-grid -->
 
 </main>
 
 <script>
-const SCENARIOS = [
-  {
-    title: "Coffee Shop Tap",
-    subtitle: "Standard NFC transaction — all rules should pass",
-    expectedRule: null,
-    payload: {
-      transactionAmount: 4.50,
-      cardNumber: "4532015112830366",
-      merchantId: "java_joe_001",
-      mcc: "5812",
-      country: "CA",
-      entryMode: "NFC_CONTACTLESS"
-    }
-  },
-  {
-    title: "Grocery Store — Chip",
-    subtitle: "Regular chip transaction at supermarket",
-    expectedRule: null,
-    payload: {
-      transactionAmount: 142.87,
-      cardNumber: "5500005555555559",
-      merchantId: "sobeys_toronto",
-      mcc: "5411",
-      country: "CA",
-      entryMode: "CHIP"
-    }
-  },
-  {
-    title: "$15,000 Transfer",
-    subtitle: "Exceeds single-transaction limit → AmountLimitRule",
-    expectedRule: "AmountLimitRule",
-    payload: {
-      transactionAmount: 15000,
-      cardNumber: "4111111111111111",
-      merchantId: "merchant_toronto",
-      mcc: "5999",
-      country: "CA",
-      entryMode: "CHIP"
-    }
-  },
-  {
-    title: "Moscow Hotel",
-    subtitle: "OFAC-sanctioned country (RU) → CountryBlacklistRule",
-    expectedRule: "CountryBlacklistRule",
-    payload: {
-      transactionAmount: 200,
-      cardNumber: "5500005555555559",
-      merchantId: "hotel_moscow",
-      mcc: "7011",
-      country: "RU",
-      entryMode: "CHIP"
-    }
-  },
-  {
-    title: "Online Casino",
-    subtitle: "Restricted MCC 7995 (gambling) → MCCRestrictionRule",
-    expectedRule: "MCCRestrictionRule",
-    payload: {
-      transactionAmount: 100,
-      cardNumber: "4111111111111111",
-      merchantId: "online_casino",
-      mcc: "7995",
-      country: "CA",
-      entryMode: "MANUAL"
-    }
-  },
-  {
-    title: "Invalid Card Number",
-    subtitle: "Fails Luhn algorithm → CardValidityRule",
-    expectedRule: "CardValidityRule",
-    payload: {
-      transactionAmount: 50,
-      cardNumber: "1234567890123456",
-      merchantId: "shop_001",
-      mcc: "5311",
-      country: "CA",
-      entryMode: "CHIP"
-    }
-  },
-  {
-    title: "$350 Contactless Tap",
-    subtitle: "NFC over $250 PCI limit → ContactlessLimitRule",
-    expectedRule: "ContactlessLimitRule",
-    payload: {
-      transactionAmount: 350,
-      cardNumber: "4532015112830366",
-      merchantId: "best_buy_001",
-      mcc: "5732",
-      country: "CA",
-      entryMode: "NFC_CONTACTLESS"
-    }
-  },
-  {
-    title: "Tehran Merchant",
-    subtitle: "OFAC-sanctioned country (IR) → CountryBlacklistRule",
-    expectedRule: "CountryBlacklistRule",
-    payload: {
-      transactionAmount: 85,
-      cardNumber: "4532015112830366",
-      merchantId: "merchant_ir",
-      mcc: "5999",
-      country: "IR",
-      entryMode: "CHIP"
-    }
-  }
+const ALL_NODES = [
+  "extract_intent","check_completeness","request_clarification",
+  "validate_input","format_error","enrich_mcc","call_odm","format_response"
 ];
-
-let stats = { total: 0, approved: 0, declined: 0 };
 const ALL_RULES = ["AmountLimitRule","CountryBlacklistRule","MCCRestrictionRule","CardValidityRule","ContactlessLimitRule"];
 
-// ── Render scenario cards ──
+const SCENARIOS = [
+  { title:"Coffee Shop Tap", subtitle:"NFC — all 5 rules pass", expectedRule:null,
+    payload:{transactionAmount:4.50,cardNumber:"4532015112830366",merchantId:"java_joe_001",mcc:"5812",country:"CA",entryMode:"NFC_CONTACTLESS"} },
+  { title:"Grocery Store — Chip", subtitle:"Standard chip transaction",expectedRule:null,
+    payload:{transactionAmount:142.87,cardNumber:"5500005555555559",merchantId:"sobeys_toronto",mcc:"5411",country:"CA",entryMode:"CHIP"} },
+  { title:"$15,000 Transfer", subtitle:"Exceeds $10k limit → AmountLimitRule",expectedRule:"AmountLimitRule",
+    payload:{transactionAmount:15000,cardNumber:"4111111111111111",merchantId:"merchant_toronto",mcc:"5999",country:"CA",entryMode:"CHIP"} },
+  { title:"Moscow Hotel", subtitle:"OFAC country RU → CountryBlacklistRule",expectedRule:"CountryBlacklistRule",
+    payload:{transactionAmount:200,cardNumber:"5500005555555559",merchantId:"hotel_moscow",mcc:"7011",country:"RU",entryMode:"CHIP"} },
+  { title:"Online Casino", subtitle:"MCC 7995 gambling → MCCRestrictionRule",expectedRule:"MCCRestrictionRule",
+    payload:{transactionAmount:100,cardNumber:"4111111111111111",merchantId:"online_casino",mcc:"7995",country:"CA",entryMode:"MANUAL"} },
+  { title:"Invalid Card Number", subtitle:"Fails Luhn → CardValidityRule",expectedRule:"CardValidityRule",
+    payload:{transactionAmount:50,cardNumber:"1234567890123456",merchantId:"shop_001",mcc:"5311",country:"CA",entryMode:"CHIP"} },
+  { title:"$350 Contactless Tap", subtitle:"NFC > $250 PCI limit → ContactlessLimitRule",expectedRule:"ContactlessLimitRule",
+    payload:{transactionAmount:350,cardNumber:"4532015112830366",merchantId:"best_buy_001",mcc:"5732",country:"CA",entryMode:"NFC_CONTACTLESS"} },
+  { title:"No MCC Supplied", subtitle:"enrich_mcc infers code from merchant name",expectedRule:null,
+    payload:{transactionAmount:12.99,cardNumber:"5500005555555559",merchantId:"sobeys_grocery_store",mcc:null,country:"CA",entryMode:"CHIP"} },
+];
+
+let stats = {total:0, approved:0, declined:0};
+
+// ── Render scenario cards ──────────────────────────────────────────────────
 function renderCards() {
-  const grid = document.getElementById('scenarios-grid');
-  grid.innerHTML = SCENARIOS.map((s, i) => `
+  document.getElementById('scenarios-grid').innerHTML = SCENARIOS.map((s,i) => `
     <div class="card" id="card-${i}">
       <div class="card-header">
-        <div>
-          <div class="title">${s.title}</div>
-          <div class="subtitle">${s.subtitle}</div>
-        </div>
+        <div><div class="title">${s.title}</div><div class="subtitle">${s.subtitle}</div></div>
         ${s.expectedRule ? `<span class="badge rule">${s.expectedRule}</span>` : ''}
       </div>
       <div class="card-params">
         <div class="param">$ <span>${s.payload.transactionAmount.toFixed(2)}</span></div>
         <div class="param">card <span>…${s.payload.cardNumber.slice(-4)}</span></div>
-        <div class="param">MCC <span>${s.payload.mcc}</span></div>
+        <div class="param">MCC <span>${s.payload.mcc||'auto'}</span></div>
         <div class="param">country <span>${s.payload.country}</span></div>
         <div class="param">mode <span>${s.payload.entryMode}</span></div>
       </div>
@@ -648,148 +361,232 @@ function renderCards() {
         <button class="btn-authorize" id="btn-${i}" onclick="authorize(${i})">Authorize</button>
       </div>
       <div class="card-result" id="result-${i}"></div>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
-// ── Build audit trail HTML ──
+// ── LangGraph node animation ───────────────────────────────────────────────
+function resetGraph() {
+  ALL_NODES.forEach(n => {
+    const el = document.getElementById(`lgn-${n}`);
+    if (el) { el.className = 'lg-node'; el.querySelector('.n-icon').textContent = ALL_NODES.indexOf(n)+1||''; }
+  });
+  for (let i=0; i<=7; i++) {
+    const e = document.getElementById(`lge-${i}`);
+    if (e) e.className = 'lg-edge';
+  }
+  document.getElementById('path-summary').classList.remove('visible');
+}
+
+async function animateGraph(trace, isError) {
+  resetGraph();
+  const edgeNodes = ["extract_intent","check_completeness","validate_input","enrich_mcc","call_odm","format_response"];
+  const symbols = {pass:'✓', fired:'✗', skip:'-'};
+  const terminalOk  = ['format_response'];
+  const terminalErr = ['request_clarification','format_error'];
+
+  for (let i = 0; i < trace.length; i++) {
+    const name = trace[i];
+    const el = document.getElementById(`lgn-${name}`);
+    if (!el) continue;
+
+    // Mark previous node as done
+    if (i > 0) {
+      const prev = document.getElementById(`lgn-${trace[i-1]}`);
+      if (prev) {
+        const isErrNode = terminalErr.includes(trace[i-1]);
+        prev.className = 'lg-node ' + (isErrNode ? 'done-err' : 'done-ok');
+        prev.querySelector('.n-icon').textContent = isErrNode ? '✗' : '✓';
+      }
+    }
+
+    // Animate connecting edge
+    const edgeIdx = edgeNodes.indexOf(name);
+    if (edgeIdx >= 0) {
+      const edgeEl = document.getElementById(`lge-${edgeIdx}`);
+      if (edgeEl) { edgeEl.className = 'lg-edge active'; await sleep(80); }
+    }
+
+    // Activate current node
+    el.className = 'lg-node active';
+    el.querySelector('.n-icon').textContent = '⋯';
+    await sleep(160);
+  }
+
+  // Final node state
+  if (trace.length > 0) {
+    const last = trace[trace.length-1];
+    const lastEl = document.getElementById(`lgn-${last}`);
+    if (lastEl) {
+      const isErrNode = terminalErr.includes(last) || isError;
+      lastEl.className = 'lg-node ' + (isErrNode ? 'done-err' : 'done-ok');
+      lastEl.querySelector('.n-icon').textContent = isErrNode ? '✗' : '✓';
+    }
+  }
+
+  // Skip unvisited
+  ALL_NODES.forEach(n => {
+    if (!trace.includes(n)) {
+      const el = document.getElementById(`lgn-${n}`);
+      if (el) el.classList.add('skipped');
+    }
+  });
+
+  // Mark END
+  const endEl = document.getElementById('lgn-END');
+  if (endEl) {
+    const lastEdge = document.getElementById('lge-7');
+    if (lastEdge && trace.includes('format_response')) lastEdge.className = 'lg-edge done';
+    endEl.style.borderColor = isError ? 'var(--declined)' : 'var(--approved)';
+    endEl.style.opacity = '1';
+  }
+}
+
+function showPathSummary(trace, path, isApproved) {
+  const el = document.getElementById('path-summary');
+  const pathText = document.getElementById('path-text');
+  const nodesEl = document.getElementById('path-nodes');
+  const terminalErr = ['request_clarification','format_error'];
+
+  const label = path === 'happy_path'
+    ? (isApproved ? 'Happy path — APPROVED' : 'Happy path — DECLINED by ODM')
+    : path === 'validation_error' ? 'Validation error path'
+    : 'Clarification required path';
+  pathText.textContent = label;
+
+  nodesEl.innerHTML = trace.map((n,i) => {
+    const isLast = i === trace.length-1;
+    const cls = isLast
+      ? (terminalErr.includes(n) ? 'path-node terminal-err' : 'path-node terminal-ok')
+      : 'path-node visited';
+    return `<span class="${cls}">${n}</span>${i < trace.length-1 ? '<span style="color:var(--muted);font-size:.7rem">→</span>' : ''}`;
+  }).join('');
+
+  el.classList.add('visible');
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ── Audit trail HTML ───────────────────────────────────────────────────────
 function buildAuditTrail(auditTrail) {
-  const traceNames = auditTrail.map(t => t.ruleName);
   return ALL_RULES.map(ruleName => {
     const trace = auditTrail.find(t => t.ruleName === ruleName);
-    if (!trace) {
-      return `<div class="rule-row">
-        <div class="rule-icon skipped">-</div>
-        <div class="rule-name" style="color:var(--muted)">${ruleName}</div>
-        <div class="rule-msg">skipped (short-circuit)</div>
-      </div>`;
-    }
+    if (!trace) return `<div class="rule-row"><div class="rule-icon skipped">-</div><div class="rule-name" style="color:var(--muted)">${ruleName}</div><div class="rule-msg">skipped</div></div>`;
     const icon = trace.result === 'PASS' ? 'pass' : 'fired';
-    const symbol = trace.result === 'PASS' ? '✓' : '✗';
-    return `<div class="rule-row">
-      <div class="rule-icon ${icon}">${symbol}</div>
-      <div class="rule-name">${ruleName}</div>
-      <div class="rule-msg">${trace.message}</div>
-    </div>`;
+    const sym  = trace.result === 'PASS' ? '✓' : '✗';
+    return `<div class="rule-row"><div class="rule-icon ${icon}">${sym}</div><div class="rule-name">${ruleName}</div><div class="rule-msg">${trace.message}</div></div>`;
   }).join('');
 }
 
-// ── Authorize a preset scenario ──
+// ── Render result panel ────────────────────────────────────────────────────
+function renderResult(container, data) {
+  const odm = data.odm_response || {};
+  const isApproved = odm.decision === 'APPROVED';
+  const detail = isApproved
+    ? `<span class="auth-code">Auth: ${odm.authorizationCode}</span>`
+    : `<span class="decline-reason">${odm.declineReason || data.final_answer}</span>`;
+
+  const enriched = data.extracted && data.extracted.mcc && !SCENARIOS.find(s=>s.payload.mcc === data.extracted.mcc)
+    ? `<div style="font-size:.7rem;color:var(--warning);margin-bottom:6px;">MCC enriched → ${data.extracted.mcc}</div>` : '';
+
+  container.innerHTML = `
+    ${enriched}
+    <div class="decision-row">
+      <span class="decision-badge ${odm.decision||'DECLINED'}">${odm.decision||'ERROR'}</span>
+      <span class="rc-badge">RC ${odm.responseCode||'--'}</span>
+      ${detail}
+    </div>
+    <div class="audit-label">IBM ODM Audit Trail</div>
+    <div class="audit-trail">${buildAuditTrail(odm.auditTrail||[])}</div>
+  `;
+  container.classList.add('visible');
+}
+
+// ── Authorize preset scenario ──────────────────────────────────────────────
 async function authorize(i) {
   const btn = document.getElementById(`btn-${i}`);
   const resultDiv = document.getElementById(`result-${i}`);
   const card = document.getElementById(`card-${i}`);
-
   btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span>Running rules…';
+  btn.innerHTML = '<span class="spinner"></span>Running workflow…';
 
   try {
-    const res = await fetch('/api/authorize', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    const res = await fetch('/api/workflow', {
+      method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify(SCENARIOS[i].payload)
     });
     const data = await res.json();
+    const odm = data.odm_response || {};
+    const isApproved = odm.decision === 'APPROVED';
+    const isError = ['format_error','request_clarification'].includes((data.step_trace||[]).slice(-1)[0]);
+
+    await animateGraph(data.step_trace || [], isError);
+    showPathSummary(data.step_trace || [], data.path, isApproved);
     renderResult(resultDiv, data);
 
-    card.className = 'card ' + data.decision.toLowerCase();
-    updateStats(data.decision);
-
+    card.className = 'card ' + (isApproved ? 'approved' : 'declined');
+    updateStats(odm.decision || 'DECLINED');
     btn.innerHTML = 'Run Again';
-  } catch (e) {
-    resultDiv.innerHTML = `<div style="color:var(--declined);font-size:.8rem">Error: ${e.message}</div>`;
+  } catch(e) {
+    resultDiv.innerHTML = `<div style="color:var(--declined);font-size:.78rem">Error: ${e.message}</div>`;
     resultDiv.classList.add('visible');
     btn.innerHTML = 'Retry';
   }
   btn.disabled = false;
 }
 
-// ── Render result HTML ──
-function renderResult(container, data) {
-  const isApproved = data.decision === 'APPROVED';
-  const detail = isApproved
-    ? `<span class="auth-code">Auth: ${data.authorizationCode}</span>`
-    : `<span class="decline-reason">${data.declineReason}</span>`;
-
-  container.innerHTML = `
-    <div class="decision-row">
-      <span class="decision-badge ${data.decision}">${data.decision}</span>
-      <span class="rc-badge">RC ${data.responseCode}</span>
-      ${detail}
-    </div>
-    <div class="audit-label">Audit Trail — IBM ODM Ruleflow</div>
-    <div class="audit-trail">${buildAuditTrail(data.auditTrail)}</div>
-  `;
-  container.classList.add('visible');
-}
-
-// ── Custom transaction ──
+// ── Custom transaction ─────────────────────────────────────────────────────
 async function runCustom() {
   const btn = document.getElementById('btn-custom');
   const resultDiv = document.getElementById('custom-result');
-
   btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span>Running rules…';
+  btn.innerHTML = '<span class="spinner"></span>Running…';
 
   const payload = {
     transactionAmount: parseFloat(document.getElementById('f-amount').value),
     cardNumber: document.getElementById('f-card').value.trim(),
     merchantId: document.getElementById('f-merchant').value.trim(),
-    mcc: document.getElementById('f-mcc').value.trim(),
+    mcc: document.getElementById('f-mcc').value.trim() || null,
     country: document.getElementById('f-country').value.trim().toUpperCase(),
     entryMode: document.getElementById('f-entry').value,
   };
 
   try {
-    const res = await fetch('/api/authorize', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    const res = await fetch('/api/workflow', {
+      method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify(payload)
     });
     const data = await res.json();
+    const odm = data.odm_response || {};
+    const isApproved = odm.decision === 'APPROVED';
+    const isError = ['format_error','request_clarification'].includes((data.step_trace||[]).slice(-1)[0]);
 
-    const isApproved = data.decision === 'APPROVED';
-    const detail = isApproved
-      ? `<span class="auth-code">Auth: ${data.authorizationCode}</span>`
-      : `<span class="decline-reason">${data.declineReason}</span>`;
-
-    resultDiv.innerHTML = `
-      <div class="decision-row">
-        <span class="decision-badge ${data.decision}">${data.decision}</span>
-        <span class="rc-badge">RC ${data.responseCode}</span>
-        ${detail}
-      </div>
-      <div class="audit-label">Audit Trail</div>
-      <div class="audit-trail">${buildAuditTrail(data.auditTrail)}</div>
-    `;
-    resultDiv.classList.add('visible');
-    updateStats(data.decision);
-  } catch (e) {
-    resultDiv.innerHTML = `<div style="color:var(--declined);font-size:.8rem">Error: ${e.message}</div>`;
+    await animateGraph(data.step_trace || [], isError);
+    showPathSummary(data.step_trace || [], data.path, isApproved);
+    renderResult(resultDiv, data);
+    updateStats(odm.decision || 'DECLINED');
+  } catch(e) {
+    resultDiv.innerHTML = `<div style="color:var(--declined);font-size:.78rem">Error: ${e.message}</div>`;
     resultDiv.classList.add('visible');
   }
-
   btn.disabled = false;
   btn.innerHTML = 'Authorize Now';
 }
 
-// ── Stats ──
+// ── Stats ──────────────────────────────────────────────────────────────────
 function updateStats(decision) {
   stats.total++;
-  if (decision === 'APPROVED') stats.approved++;
-  else stats.declined++;
-  document.getElementById('stat-total').textContent = stats.total;
+  if (decision === 'APPROVED') stats.approved++; else stats.declined++;
+  document.getElementById('stat-total').textContent    = stats.total;
   document.getElementById('stat-approved').textContent = stats.approved;
   document.getElementById('stat-declined').textContent = stats.declined;
 }
 
-// ── Server health check ──
+// ── Health check ───────────────────────────────────────────────────────────
 async function checkHealth() {
   try {
-    const res = await fetch('/health');
-    const data = await res.json();
+    const d = await (await fetch('/health')).json();
     document.getElementById('status-dot').style.background = 'var(--approved)';
-    document.getElementById('status-text').textContent = data.engine;
+    document.getElementById('status-text').textContent = d.engine;
   } catch {
     document.getElementById('status-dot').style.background = 'var(--declined)';
     document.getElementById('status-dot').style.animation = 'none';
@@ -797,7 +594,6 @@ async function checkHealth() {
   }
 }
 
-// ── Init ──
 renderCards();
 checkHealth();
 </script>
